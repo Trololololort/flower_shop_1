@@ -116,7 +116,10 @@ II. Уяснение задачи
 2. Никакого оверинжиниригна, пока не готов MVP. Не додумывае ТЗ. До разработки MVP ТЗ трактуется буквально
 и в пользу программиста (не упомянуто - не сделано, непонятно упомянуто - трактуем так, как легче сделать).
 
-На этом этапе: не упомянута пагинация - ее нет. Не упомянут футер - его нет. И т.п. 
+На этом этапе: не упомянута пагинация - ее нет. Не упомянут футер - его нет. И т.п.
+
+NB! Это только на этапе MVP. Без хорошо выглядящего сайта хорошей оценки не будет.
+Поэтому позже доработаем.
 
 3. Никаких красивостей, пока не готов MVP. Останется время - раскрасите. 
 Вертка крупными блоками копированием и вставкой из Zeal.
@@ -366,8 +369,157 @@ class NameMixin(models.Model):
 Нюанс: надо объявить, что класс абстрактный.
 Иначе в базе данных создастся таблица: ведь класс наследует от модели.
 
-9. Добавить модель Category в административную панель.
+Применить миксин в упомянутых моделях. Теперь они выглядят так:
+class Country(NameMixin, models.Model):
+    class Meta:
+        verbose_name = "Страна"
+        verbose_name_plural = "Страны"
 
 
+class Category(NameMixin, models.Model):
+    class Meta:
+        verbose_name = "Категория/Вид товара"
+        verbose_name_plural = "Категории/Виды товаров"
+
+
+Проверить в работе.
+
+9. Добавить модели Country и Category в административную панель.
+
+В products/admin.py:
+
+from products.models import Country, Category
+
+admin.site.register(Country)
+admin.site.register(Category)
+
+Проверьте в работе: добавьте страну и категорию.
+
+10. Создайте модель Color и добавьте ее в административную панель.
+
+В products/models.py:
+
+class Color(NameMixin, models.Model):
+    class Meta:
+        verbose_name = "Цвет"
+        verbose_name_plural = "Цвета"
+
+В products/admin.py:
+admin.site.register(Color)
+
+Выполните миграции (! У вас две команды в открытом текстовом редакторе).
+Проверьте в работе: добавьте цвет.
+
+
+10. Дополните настройки для работы со статическими файлами.
+
+Документация: https://docs.djangoproject.com/en/5.0/howto/static-files/
+Zeal: static files
+
+В settings.py:
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+Если MEDIA_ROOT не обозначить, файлы, загруженные пользователями, будут
+попадать в корень проекта.
+
+Документация: https://docs.djangoproject.com/en/5.0/ref/settings/#media-url
+Zeal: media
+
+В flower_shop/urls.py:
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... the rest of your URLconf goes here ...
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
++ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+11. Создайте модель Product и добавьте ее в административную панель.
+
+В products/models.py:
+
+class Goods(NameMixin, models.Model):
+    added = models.DateTimeField(auto_now_add=True,
+                                 verbose_name="Дата добавления")
+
+    # 500 x 500 px.
+    photo = models.ImageField(verbose_name="Фото", blank=False)
+    price = models.DecimalField(max_digits=10,
+                                decimal_places=2,
+                                verbose_name="Цена",
+                                validators=[MinValueValidator(Decimal('0.01'))])
+    origin = models.ForeignKey(
+        "Country",
+        on_delete=models.CASCADE,
+        verbose_name="Страна-производитель",
+    )
+
+    color = models.ForeignKey(
+        "Color",
+        on_delete=models.CASCADE,
+        verbose_name="Цвет",
+    )
+
+    category = models.ForeignKey(
+        "Category",
+        on_delete=models.CASCADE,
+        verbose_name="Категория / Вид товара",
+    )
+
+    stock = models.PositiveIntegerField(default=0,
+                                        null=False,
+                                        blank=False,
+                                        verbose_name="Остаток товара")
+
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/models/fields/#datetimefield
+2) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.ImageField
+3) https://docs.djangoproject.com/en/5.0/ref/models/fields/#decimalfield
+4) https://docs.djangoproject.com/en/5.0/ref/validators/#minvaluevalidator
+5) https://docs.djangoproject.com/en/5.0/ref/models/fields/#foreignkey
+6) https://docs.djangoproject.com/en/5.0/ref/models/fields/#positiveintegerfield
+
+
+Zeal:
+1) datetimefield
+2) imagefield
+3) decimalfield
+4) minvaluevalidator
+5) foreignkey
+6) positiveintegerfield
+
+В admin.py:
+
+class GoodsAdmin(admin.ModelAdmin):
+    exclude = []
+    list_display = ["id", "name", "color", "stock", ]
+
+
+admin.site.register(Goods, GoodsAdmin)
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#modeladmin-objects
+2) https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.exclude
+3) https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_display
+
+
+Zeal:
+1) ModelAdmin objects
+2) Неизвестно.
+3) list_display
+
+Проверьте в работе. Обратите внимание: надо обрезать изображения (500 х 500 px).
+
+11.
 
 

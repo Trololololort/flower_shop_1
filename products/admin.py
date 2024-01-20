@@ -1,5 +1,15 @@
 from django.contrib import admin
 
-from products.models import Country
+from products.models import Country, Category, Color, Goods
 
 admin.site.register(Country)
+admin.site.register(Category)
+admin.site.register(Color)
+
+
+class GoodsAdmin(admin.ModelAdmin):
+    exclude = []
+    list_display = ["id", "name", "color", "stock", ]
+
+
+admin.site.register(Goods, GoodsAdmin)
