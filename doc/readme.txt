@@ -342,6 +342,7 @@ python manage.py migrate
 Теперь копируем в буфер обмена сразу две строки.
 И вставляем в терминал. Так экономим время.
 
+
 8. Создать NameMixin и применить его к Country и Category.
 
 Видим, что задвоенный код. Наименование совпадает. И метод str.
@@ -384,6 +385,7 @@ class Category(NameMixin, models.Model):
 
 Проверить в работе.
 
+
 9. Добавить модели Country и Category в административную панель.
 
 В products/admin.py:
@@ -394,6 +396,7 @@ admin.site.register(Country)
 admin.site.register(Category)
 
 Проверьте в работе: добавьте страну и категорию.
+
 
 10. Создайте модель Color и добавьте ее в административную панель.
 
@@ -409,6 +412,7 @@ admin.site.register(Color)
 
 Выполните миграции (! У вас две команды в открытом текстовом редакторе).
 Проверьте в работе: добавьте цвет.
+
 
 
 11. Дополните настройки для работы со статическими файлами.
@@ -542,7 +546,7 @@ class ProductDetailView(DetailView):
 Создадим шаблон в приложении products:
     templates/products/product_detail.html
 
-В нем напишем любое слово. Допустим, product.
+В нем напишем любое слово. Допустим, detail.
 
 Проверьте (посмотрев id товара в админке):
 http://localhost:8000/products/4/
@@ -575,32 +579,49 @@ Zeal:
 5) usage in your urlconf
 
 
-14. Доработайте модель product, создав в ней метод get_absolute_url.
+14. Доработайте шаблон product_detail.html, чтобы отображал данные.
+
+<p>{{ object.name }}</p>
+<p>{{ object.added }}</p>
+<p>{{ object.photo.url }}</p>
+<p>{{ object.price }}</p>
+<p>{{ object.origin }}</p>
+<p>{{ object.color }}</p>
+<p>{{ object.category }}</p>
+<p>{{ object.stock }}</p>
+
+
+15. Доработайте модель product, создав в ней метод get_absolute_url.
 
     def get_absolute_url(self):
         return reverse('product-detail', kwargs={"pk": self.id})
 
 Это удобно, и это общепринятая практика.
 
-Проверить пока не можем.
-Но если очень хочется, то зажать ctrl, клик на DetailView,
-клик на SingleObjectTemplateResponseMixin.
+Попробуем этот метод в шаблоне.
 
-Поставить точку останова где-нибудь в методе get_template_names.
-И evaluate expression:
+<p>{{ object.get_absolute_url }}</p>
 
-self.object.get_absolute_url()
+Уберите эту строку: мы опробовали метод, но сейчас он нам в шаблоне не нужен.
+
+Обратите внимание:
+1) В шаблон передан контекст. Работает магия. В контексте есть object.
+2) Осмотреться (что есть в контексте) в шаблоне можно, написав {% debug %}.
+2) Метод в шаблоне вызывается без круглых скобок.
+3) Доступ к полям и методам - через точку.
 
 Документация:
 1) https://docs.djangoproject.com/en/5.0/ref/urlresolvers/#reverse
 2) https://docs.djangoproject.com/en/5.0/ref/models/instances/#django.db.models.Model.get_absolute_url
+3) https://docs.djangoproject.com/en/5.0/ref/templates/api/#variables-and-lookups
 
 
 Zeal:
 1) reverse
 2) get_absolute_url
+3) template language
 
-13. Добавьте менеджер в модель Product.
+16. Добавьте менеджер в модель Product.
 
 Т.к. все товары, которые показываются пользователю, должно быть в наличии,
 сразу сделаем себе специальный менеджер. И заодно упорядочим товары так, как нам
@@ -626,9 +647,39 @@ class Product(NameMixin,
 2) https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-specific-objects-with-filters
 3) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#gte
 4) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#django.db.models.query.QuerySet.order_by
+5) https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#debug
 
 Zeal:
 1) manager
 2) queries
 3) gte
 4) order_by
+5) template tags
+
+
+
+17. Создайте метод и шаблон для отображения списка товара. Настройте URL.
+
+В products/views.py:
+
+class ProductListView(ListView):
+    model = Product
+
+    def get_queryset(self):
+        queryset = Product.in_stock.all()
+        return queryset
+
+В products/templates/product_list.html:
+
+{% for object in object_list %}
+    <p><a href={{ object.get_absolute_url }}>{{ object.id }} {{ object.name }}</p>
+{% endfor %}
+
+Обратите внимание:
+1) Работает магия: назовите правильно шаблон, и не придется писать его имя специально.
+Но если забылось, можно всегда указать явно template_name.
+2) Нам надо задействовать свой менеджер in_stock. Для этого вмешиваемся в работу алгоритма:
+переопределяем метод get_queryset.
+
+Для эксперимента: в админке товару поставьте нулевой остаток. И убедитесь, что
+товар пользователю не показывается.
