@@ -84,6 +84,7 @@ Zeal: runserver
 
 Запустим проект (нажимаем жука).
 В консоли видим, на каком порту стартовал проект. Нажимаем в консоли на этот адрес.
+Видим в браузере, что работает проект на Django.
 
 Комментарий: часто бывает, что порт занят. Мы включаем / выключаем дебаггер. И запущенный нами процесс может не отпустить порт.
 
@@ -234,6 +235,10 @@ class Country(models.Model):
                             blank=False,
                             default="",
                             verbose_name="Наименование")
+
+    def __str__(self):
+        return self.name
+
     class Meta:
         verbose_name = "Страна"
         verbose_name_plural = "Страны"
@@ -252,3 +257,117 @@ Zeal:
 Если не задать, __str__ в админке товар не объект иметь смыслоразличительного имени.
 
 blank=False - нельзя оставить поле пустым в админке.
+
+5. Выполнить миграции и создать суперюзера.
+Миграции - текстовые файлы с командами, последовательно изменяющими состояние базы данных.
+Аналог системы контроля версий, только для базы данных.
+
+В Django по умолчанию уже есть модель User. И у него уже созданы файлы миграций.
+Поэтому надо их применить.
+
+
+В терминале:
+python manage.py migrate
+
+Документация: https://docs.djangoproject.com/en/5.0/topics/migrations/
+Zeal: migrate
+
+
+python manage.py createsuperuser
+Документация: https://docs.djangoproject.com/en/5.0/ref/django-admin/#createsuperuser
+Zeal: createsuper
+
+Задаем имя пользователя, как в ТЗ.
+Электронная почта - любая. Пишите a@a.ru. Не теряйте время на придумывание почты.
+Пароль - как в ТЗ.
+Соглашаемся на простой пароль.
+
+
+6. Добавить страну в административную панель.
+В admin.py:
+
+from products.models import Country
+
+admin.register(Country)
+
+Запускаем, проверяем:
+http://127.0.0.1:8000/admin
+
+URL административной панели - как нам нужно по ТЗ.
+
+В админке видим: появились страны.
+
+Но при попытке добавления стран мы столкнемся с ошибкой, потому что
+база данных еще не изменена с учетом добавленной модели.
+
+Надо сделать миграции.
+
+python manage.py makemigrations
+
+Документация: https://docs.djangoproject.com/en/5.0/ref/django-admin/#makemigrations
+Zeal: makemigrations
+
+python manage.py migrate
+
+Теперь можно в административной панели добавлять страну. Добавим Россию.
+
+7. Добавить модель Category.
+
+В products/models.py
+
+class Category(models.Model):
+    name = models.CharField(max_length=100,
+                            null=False,
+                            blank=False,
+                            default="",
+                            verbose_name="Наименование")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Категория/Вид товара"
+        verbose_name_plural = "Категории/Виды товаров"
+
+Сразу мигрируем.
+
+Откройте текстовый редактор и сохраните себе.
+
+python manage.py makemigrations
+python manage.py migrate
+
+Теперь копируем в буфер обмена сразу две строки.
+И вставляем в терминал. Так экономим время.
+
+8. Создать NameMixin и применить его к Country и Category.
+
+Видим, что задвоенный код. Наименование совпадает. И метод str.
+
+В приложении general создадим файл model_mixins.py.
+
+В нем пишем:
+
+from django.db import models
+
+
+class NameMixin(models.Model):
+    name = models.CharField(max_length=100,
+                            null=False,
+                            blank=False,
+                            default="",
+                            verbose_name="Наименование")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+Нюанс: надо объявить, что класс абстрактный.
+Иначе в базе данных создастся таблица: ведь класс наследует от модели.
+
+9. Добавить модель Category в административную панель.
+
+
+
+
