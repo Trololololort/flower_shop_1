@@ -447,7 +447,7 @@ class Product(NameMixin, models.Model):
                                  verbose_name="Дата добавления")
 
     # 500 x 500 px.
-    photo = models.ImageField(verbose_name="Фото", blank=False)
+    photo = models.ImageField(verbose_name="Фото. Рекомендовано 500 x 500 px", blank=False)
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2,
                                 verbose_name="Цена",
@@ -576,6 +576,29 @@ Zeal:
 
 
 14. Доработайте модель product, создав в ней метод get_absolute_url.
+
+    def get_absolute_url(self):
+        return reverse('product-detail', kwargs={"pk": self.id})
+
+Это удобно, и это общепринятая практика.
+
+Проверить пока не можем.
+Но если очень хочется, то зажать ctrl, клик на DetailView,
+клик на SingleObjectTemplateResponseMixin.
+
+Поставить точку останова где-нибудь в методе get_template_names.
+И evaluate expression:
+
+self.object.get_absolute_url()
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/urlresolvers/#reverse
+2) https://docs.djangoproject.com/en/5.0/ref/models/instances/#django.db.models.Model.get_absolute_url
+
+
+Zeal:
+1) reverse
+2) get_absolute_url
 
 13. Добавьте менеджер в модель Product.
 

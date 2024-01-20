@@ -1,7 +1,9 @@
 from _decimal import Decimal
 
+
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.urls import reverse
 
 from general.model_mixins import NameMixin
 
@@ -40,8 +42,8 @@ class Product(NameMixin,
     added = models.DateTimeField(auto_now_add=True,
                                  verbose_name="Дата добавления")
 
-    # 500 x 500 px.
-    photo = models.ImageField(verbose_name="Фото", blank=False)
+
+    photo = models.ImageField(verbose_name="Фото. Рекомендовано 500 x 500 px", blank=False)
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2,
                                 verbose_name="Цена",
@@ -68,6 +70,9 @@ class Product(NameMixin,
                                         null=False,
                                         blank=False,
                                         verbose_name="Остаток товара")
+
+    def get_absolute_url(self):
+        return reverse('product-detail', kwargs={"pk": self.id})
 
     class Meta:
         verbose_name = "Товар"
