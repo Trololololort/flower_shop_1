@@ -442,7 +442,7 @@ urlpatterns = [
 
 В products/models.py:
 
-class Goods(NameMixin, models.Model):
+class Product(NameMixin, models.Model):
     added = models.DateTimeField(auto_now_add=True,
                                  verbose_name="Дата добавления")
 
@@ -500,12 +500,12 @@ Zeal:
 
 В admin.py:
 
-class GoodsAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     exclude = []
     list_display = ["id", "name", "color", "stock", ]
 
 
-admin.site.register(Goods, GoodsAdmin)
+admin.site.register(Product, ProductAdmin)
 
 Документация:
 1) https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#modeladmin-objects
@@ -521,6 +521,91 @@ Zeal:
 Проверьте в работе. Обратите внимание: надо обрезать изображения (500 х 500 px).
 Посмотрите, что загруженные пользователем изображения попадают в каталог media.
 
-13.
+
+13. Создайте метод-заглушку и шаблон для отображения карточки товара. Настройте URL.
+
+В products/views.py:
+
+class ProductDetailView(DetailView):
+    model = Product
+
+В flowershop_urls.py:
+    path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
+
+Обратите внимание:
+1) Нужно обязательно вызвать метод as_view().
+2) Мы именуем путь. Так можно в любом месте всегда получить этот путь по имени.
+Так соблюдается принцип DRY: теперь путь можно поменять только в одном месте,
+а не во многих.
 
 
+Создадим шаблон в приложении products:
+    templates/products/product_detail.html
+
+В нем напишем любое слово. Допустим, product.
+
+Проверьте (посмотрев id товара в админке):
+http://localhost:8000/products/4/
+Здесь 4 - это id товара.
+
+Достаточно важно назвать шаблон правильно. В документации есть пример, как назвать.
+Здесь convention over configuration: как видите, шаблон не указан, но работает.
+
+Если вдруг забудется, как называть шаблон, то зажимаем ctrl и клик на DetailView.
+Затем, не отпуская ctrl, клик на SingleObjectTemplateResponseMixin.
+И видим, какое нужно имя шаблона: тут и суффикс, и метод получения имени шаблона.
+Т.е. мы видим суффикс _detail, который будет присоединен к имени модели (в нижнем регистре).
+
+Если совсем забудется, то всегда можно указать шаблон явно, в переменной template_name.
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#detailview
+2) https://docs.djangoproject.com/en/5.0/topics/http/urls/#example
+3) https://docs.djangoproject.com/en/5.0/topics/http/urls/#path-converters
+4) https://docs.djangoproject.com/en/5.0/topics/http/urls/#naming-url-patterns
+5) https://docs.djangoproject.com/en/5.0/topics/class-based-views/#usage-in-your-urlconf
+
+Zeal:
+1) detailview
+2) urls
+3) path converters
+4) naming url patterns
+5) usage in your urlconf
+
+
+14. Доработайте модель product, создав в ней метод get_absolute_url.
+
+13. Добавьте менеджер в модель Product.
+
+Т.к. все товары, которые показываются пользователю, должно быть в наличии,
+сразу сделаем себе специальный менеджер. И заодно упорядочим товары так, как нам
+чаще всего надо.
+
+При этом надо сохранить менеджер по умолчанию (хранимый в переменной objects).
+
+В products/models.py:
+
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        # В наличии и упорядоченные по убыванию даты добавления товара.
+        return super().get_queryset().filter(stock__gte=1).order_by("-added")
+
+class Product(NameMixin,
+            models.Model):
+    objects = models.Manager()  # По умолчанию. Нужен для админки.
+    in_stock = ProductManager()
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/topics/db/managers/#modifying-a-manager-s-initial-queryset
+2) https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-specific-objects-with-filters
+3) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#gte
+4) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#django.db.models.query.QuerySet.order_by
+
+Zeal:
+1) manager
+2) queries
+3) gte
+4) order_by

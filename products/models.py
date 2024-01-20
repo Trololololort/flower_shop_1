@@ -6,25 +6,37 @@ from django.db import models
 from general.model_mixins import NameMixin
 
 
-class Country(NameMixin, models.Model):
+class Country(NameMixin,
+              models.Model):
     class Meta:
         verbose_name = "Страна"
         verbose_name_plural = "Страны"
 
 
-class Category(NameMixin, models.Model):
+class Category(NameMixin,
+               models.Model):
     class Meta:
         verbose_name = "Категория/Вид товара"
         verbose_name_plural = "Категории/Виды товаров"
 
 
-class Color(NameMixin, models.Model):
+class Color(NameMixin,
+            models.Model):
     class Meta:
         verbose_name = "Цвет"
         verbose_name_plural = "Цвета"
 
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        # В наличии и упорядоченные по убыванию даты добавления товара.
+        return super().get_queryset().filter(stock__gte=1).order_by("-added")
 
-class Goods(NameMixin, models.Model):
+
+class Product(NameMixin,
+              models.Model):
+    objects = models.Manager()  # По умолчанию. Нужен для админки.
+    in_stock = ProductManager()
+
     added = models.DateTimeField(auto_now_add=True,
                                  verbose_name="Дата добавления")
 
