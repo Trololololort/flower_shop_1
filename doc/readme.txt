@@ -1439,55 +1439,6 @@ class UserMixin(models.Model):
         abstract = True
 
 
-29. Создать приложение orders и модель Order.
-
-python manage.py startapp orders
-
-Добавить orders в INSTALLED_APPS.
-
-В приложении orders создайте файл const.py.
-
-ORDER_STATUS = [
-    ("NEW", "Новый"),
-    ("CONFIRMED", "Подтвержден"),
-    ("CANCELLED", "Отменен"),
-]
-
-Создайте модель Order:
-
-class Order(UserMixin,
-            models.Model):
-
-    ordered = models.DateTimeField(auto_now_add=True,
-                                   verbose_name="Дата заказа")
-    status = models.CharField(max_length=9,
-                              choices=ORDER_STATUS,
-                              verbose_name="Статус",
-                              blank=True,
-                              null=False,
-                              default="NEW")
-
-    cancellation_cause = models.TextField(verbose_name="Причина отказа",
-                                          default="",
-                                          null=False,
-                                          blank=True)
-
-    def __str__(self):
-        return "{}".format(self.id)
-
-    class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
-
-
-
-Документация:
-1) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.DateTimeField
-2) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.CharField
-3) https://docs.djangoproject.com/en/5.0/ref/models/fields/#choices
-4) https://docs.djangoproject.com/en/5.0/ref/models/fields/#textfield
-
-
 29. Создать приложение carts и модель Cart.
 
 python manage.py startapp carts
@@ -1927,11 +1878,11 @@ Django в шаблоне не может перемножать цифры.
                     <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
                     <td class="text-center">{{ object.product.price }}</td>
                     <td class="text-end">
-                    {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+                        {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
                     </td>
 
                     <td class="text-start">
-                    {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+                        {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
                     </td>
 
                     <td class="text-center">{{ object.quantity }}</td>
@@ -1989,13 +1940,167 @@ urlpatterns = [
 А в случае корзины символы "+" и "-" имеют разную ширину.
 И под палец на мобильных устройствах лучше больше простора.
 
-30. Создайте view для просмотра заказов.
+
+40. Создать приложение orders и модель Order.
+
+python manage.py startapp orders
+
+Добавить orders в INSTALLED_APPS.
+
+В приложении orders создайте файл const.py.
+
+ORDER_STATUS = [
+    ("NEW", "Новый"),
+    ("CONFIRMED", "Подтвержден"),
+    ("CANCELLED", "Отменен"),
+]
+
+Создайте модель Order:
+
+class Order(UserMixin,
+            models.Model):
+
+    ordered = models.DateTimeField(auto_now_add=True,
+                                   verbose_name="Дата заказа")
+    status = models.CharField(max_length=9,
+                              choices=ORDER_STATUS,
+                              verbose_name="Статус",
+                              blank=True,
+                              null=False,
+                              default="NEW")
+
+    cancellation_cause = models.TextField(verbose_name="Причина отказа",
+                                          default="",
+                                          null=False,
+                                          blank=True)
+
+    def __str__(self):
+        return "{}".format(self.id)
+
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.DateTimeField
+2) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.CharField
+3) https://docs.djangoproject.com/en/5.0/ref/models/fields/#choices
+4) https://docs.djangoproject.com/en/5.0/ref/models/fields/#textfield
+
+
+
+41. Создайте форму для создания заказа.
+
+В приложении orders создайте файл forms.py.
+
+class OrderForm(forms.Form):
+    password = forms.CharField(
+        label="Пароль",
+        strip=False,
+        widget=forms.PasswordInput(widget=forms.PasswordInput()),
+    )
+
+
+В Django нет специальной формы для ввода пароля. Поэтому применяется виджет.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#passwordinput
+
+Zeal:
+1) passwordinput
+
+
+42. Создайте заглушки view и url для создания заказа и для просмотра списка заказов.
+
+
+class CreateOrder(LoginRequiredMixin,
+                  View):
+
+    def post(self, request):
+        pass
+
 
 class OrdersListView(LoginRequiredMixin,
                      ListView):
     model = Order
 
-    def get_queryset(self):
-        result = Order.objects.filter(user=self.request.user).order_by(
-            "-ordered")
-        return result
+
+urlpatterns = [
+    ...
+    path("orders/create/", CreateOrder.as_view(), name="create-order"),
+    path("orders/", OrdersListView.as_view(), name="orders-list"),
+
+    ]
+
+
+43. Создайте функцию для создания заказа.
+
+В приложении orders cоздайте service.py.
+
+В нем:
+
+@transaction.atomic
+def create_order(user):
+    """
+    Создать заказ и обновить корзину (добавить значение для внешнего ключа - номер заказа).
+
+    """
+    carts = Cart.objects.filter(user=user, order=None)
+
+    new_order = Order.objects.create(user=user)
+
+    carts.update(order=new_order)
+
+    return new_order.pk
+
+
+Делаем в транзакции. Потому что надо и создать заказ, и обновить корзину.
+Транзакция: либо все, либо ничего.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#create
+2) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#update
+3) https://docs.djangoproject.com/en/5.0/topics/db/transactions/#django.db.transaction.atomic
+
+Zeal:
+1) create
+2) update
+3) atomic
+
+
+43. Создайте полноценную view и url для создания заказа.
+
+class CreateOrder(LoginRequiredMixin,
+                  View):
+
+    def post(self, request):
+
+        user = request.user
+        password = request.POST.get("password")
+
+        try:
+            validate_password(password=password, user=user)
+        except ValidationError:
+            messages.add_message(request, messages.ERROR, "Неверный пароль")
+            return redirect("cart-detail")
+
+        new_order_id = create_order(user)
+
+        messages.add_message(request, messages.ERROR, "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
+
+        return redirect("orders-list")
+
+
+Есть готовая функция validate_password
+
+(from django.contrib.auth.password_validation import validate_password).
+
+Заказ формируется только из корзины. Поэтому об ошибке валидации сообщаем
+в CartDetail.
+
+Если заказ создать удалось, редирект на список заказов.
+
+Если будет выброшено исключение ValidationError, то в админке будет
+выведено сообщение.
