@@ -29,6 +29,9 @@ which python
 Проверим версию: 
 python -v
 
+2. В Chrome в Developer tools на вкладке Network сразу включаем
+Disable cache.
+
 3. Проверим установленные пакеты:
 pip freeze
 
@@ -121,11 +124,14 @@ II. Уяснение задачи
 NB! Это только на этапе MVP. Без хорошо выглядящего сайта хорошей оценки не будет.
 Поэтому позже доработаем.
 
-3. Никаких красивостей, пока не готов MVP. Останется время - раскрасите. 
+3. Никаких красивостей и мелочей, пока не готов MVP. Останется время - добавите.
 Вертка крупными блоками копированием и вставкой из Zeal.
-Не надо верстать самостоятельно. Самостоятельно - только мелкие правки вертки.
+Не надо верстать самостоятельно. Самостоятельно - только мелкие правки верстки.
 Только копирование / вставка.
 
+4. Данный материал - исключительно для подготовки к демонстрационному экзамену.
+Задача местами к олимпиадному программированию. Не воспринимайте как
+руководство для реального проекта.
 
 III. Стратегия
 
@@ -163,7 +169,7 @@ VI. Стиль:
 
 Zeal: не содержит.
 
-VI. Исполнение поэтапного плана
+VI. Стиль
 1. Приложения называем во множественном числе.
 Документация: https://docs.djangoproject.com/en/5.0/intro/tutorial01/
 Zeal: tutorial / Advanced tutorial: How to write reusable apps 
@@ -175,44 +181,13 @@ Zeal: tutorial / Advanced tutorial: How to write reusable apps
 По ссылкам дойти до Tutorial 2.
 
 
-1. Создать приложение general
+VII. Работа над проектом
+
+1. Создать приложение products.
 
 Открыть терминал в PyCharm. Именно так, а не в ОС.
 Причина: сразу будет активировано виртуальное окружение, сразу попадаете в рабочий катало, чем экономите время.
 
-
-В general будем располагать общие миксины, константы, шаблоны и т.п.
-
-Исключение из правил конвенции об именовании, т.к. general - прилагательное.
-
-python manage.py startapp general
-
-Документация: https://docs.djangoproject.com/en/5.0/ref/django-admin/#startapp
-Zeal: startapp
-
-Добавим general в settings.py в INSTALLED_APPS.
-
-Пока проверить сделанное не можем.
-
-2. Создать в general базовый шаблон.
-
-На general ПКМ / New / File / templates/general/base.html
-
-Документация: https://docs.djangoproject.com/en/5.0/intro/tutorial03/#write-views-that-actually-do-something
-
-Цитата: Within the templates directory you have just created, create another directory called polls, and within that create a file called index.html. In other words, your template should be at polls/templates/polls/index.html. Because of how the app_directories template loader works as described above, you can refer to this template within Django as polls/index.html.
-
-Т.е. применяется конвенция об именовании. Django ищет шаблоны 
-по каталогам templates всех приложений. Но программист так не может: структура
-проекта должна быть четкой. Самый простой путь добавить конкретику - всегда создавать с именем
-приложения в каталоге templates этого приложения. Теперь мы можем ссылаться
-на созданный шаблон general/base.html. И понятно, что он находится в приложении general.
-
-В base.html пока ничего не пишем.
-
-Пока проверить созданное не можем.
-
-3. Создать приложение products.
 
 Выбор наименования: goods всегда во множественном числе, commodity - слишком сложно
 для запоминания. Пусть будет products. Это товары.
@@ -221,7 +196,10 @@ python manage.py startapp products
 
 В settings.py добавить в INSTALLED_APPS products.
 
-4. Создать модель Country
+Документация: https://docs.djangoproject.com/en/5.0/ref/django-admin/#startapp
+Zeal: startapp
+
+2. Создать модель Country
 
 Нам надо знать, из какой страны товар происходит.
 
@@ -261,7 +239,7 @@ Zeal:
 
 blank=False - нельзя оставить поле пустым в админке.
 
-5. Выполнить миграции и создать суперюзера.
+3. Выполнить миграции и создать суперюзера.
 Миграции - текстовые файлы с командами, последовательно изменяющими состояние базы данных.
 Аналог системы контроля версий, только для базы данных.
 
@@ -286,7 +264,7 @@ Zeal: createsuper
 Соглашаемся на простой пароль.
 
 
-6. Добавить страну в административную панель.
+4. Добавить страну в административную панель.
 В admin.py:
 
 from products.models import Country
@@ -314,7 +292,8 @@ python manage.py migrate
 
 Теперь можно в административной панели добавлять страну. Добавим Россию.
 
-7. Добавить модель Category.
+
+5. Добавить модель Category.
 
 В products/models.py
 
@@ -343,7 +322,22 @@ python manage.py migrate
 И вставляем в терминал. Так экономим время.
 
 
-8. Создать NameMixin и применить его к Country и Category.
+6. Создать приложение general
+
+В general будем располагать общие миксины, константы, шаблоны и т.п.
+
+Исключение из правил конвенции об именовании, т.к. general - прилагательное.
+
+python manage.py startapp general
+
+
+Добавим general в settings.py в INSTALLED_APPS.
+
+Пока проверить сделанное не можем.
+
+
+
+7. Создать NameMixin и применить его к Country и Category.
 
 Видим, что задвоенный код. Наименование совпадает. И метод str.
 
@@ -386,7 +380,7 @@ class Category(NameMixin, models.Model):
 Проверить в работе.
 
 
-9. Добавить модели Country и Category в административную панель.
+8. Добавить модели Country и Category в административную панель.
 
 В products/admin.py:
 
@@ -398,7 +392,7 @@ admin.site.register(Category)
 Проверьте в работе: добавьте страну и категорию.
 
 
-10. Создайте модель Color и добавьте ее в административную панель.
+9. Создайте модель Color и добавьте ее в административную панель.
 
 В products/models.py:
 
@@ -415,7 +409,7 @@ admin.site.register(Color)
 
 
 
-11. Дополните настройки для работы со статическими файлами.
+10. Дополните настройки для работы со статическими файлами.
 
 Документация: https://docs.djangoproject.com/en/5.0/howto/static-files/
 Zeal: static files
@@ -442,7 +436,7 @@ urlpatterns = [
 
 
 
-12. Создайте модель Product и добавьте ее в административную панель.
+11. Создайте модель Product и добавьте ее в административную панель.
 
 В products/models.py:
 
@@ -526,7 +520,7 @@ Zeal:
 Посмотрите, что загруженные пользователем изображения попадают в каталог media.
 
 
-13. Создайте метод-заглушку и шаблон для отображения карточки товара. Настройте URL.
+12. Создайте метод-заглушку и шаблон для отображения карточки товара. Настройте URL.
 
 В products/views.py:
 
@@ -543,8 +537,20 @@ class ProductDetailView(DetailView):
 а не во многих.
 
 
+
 Создадим шаблон в приложении products:
     templates/products/product_detail.html
+
+Документация: https://docs.djangoproject.com/en/5.0/intro/tutorial03/#write-views-that-actually-do-something
+Zeal: tutorial, отмотать до Writing your first Django app, part 3.
+
+Цитата: Within the templates directory you have just created, create another directory called polls, and within that create a file called index.html. In other words, your template should be at polls/templates/polls/index.html. Because of how the app_directories template loader works as described above, you can refer to this template within Django as polls/index.html.
+
+Т.е. применяется конвенция об именовании. Django ищет шаблоны
+по каталогам templates всех приложений. Но программист так не может: структура
+проекта должна быть четкой. Самый простой путь добавить конкретику - всегда создавать с именем
+приложения в каталоге templates этого приложения. Теперь мы можем ссылаться
+на созданный шаблон general/base.html. И понятно, что он находится в приложении general.
 
 В нем напишем любое слово. Допустим, detail.
 
@@ -579,7 +585,7 @@ Zeal:
 5) usage in your urlconf
 
 
-14. Доработайте шаблон product_detail.html, чтобы отображал данные.
+13. Доработайте шаблон product_detail.html, чтобы отображал данные.
 
 <p>{{ object.name }}</p>
 <p>{{ object.added }}</p>
@@ -590,8 +596,14 @@ Zeal:
 <p>{{ object.category }}</p>
 <p>{{ object.stock }}</p>
 
+Обратите внимание:
+1) В шаблон передан контекст. Работает магия. В контексте есть object.
+2) Осмотреться (что есть в контексте) в шаблоне можно, написав {% debug %}.
+2) Метод в шаблоне вызывается без круглых скобок.
+3) Доступ к полям и методам - через точку.
 
-15. Доработайте модель product, создав в ней метод get_absolute_url.
+
+14. Доработайте модель product, создав в ней метод get_absolute_url.
 
     def get_absolute_url(self):
         return reverse('product-detail', kwargs={"pk": self.id})
@@ -604,11 +616,6 @@ Zeal:
 
 Уберите эту строку: мы опробовали метод, но сейчас он нам в шаблоне не нужен.
 
-Обратите внимание:
-1) В шаблон передан контекст. Работает магия. В контексте есть object.
-2) Осмотреться (что есть в контексте) в шаблоне можно, написав {% debug %}.
-2) Метод в шаблоне вызывается без круглых скобок.
-3) Доступ к полям и методам - через точку.
 
 Документация:
 1) https://docs.djangoproject.com/en/5.0/ref/urlresolvers/#reverse
@@ -621,7 +628,8 @@ Zeal:
 2) get_absolute_url
 3) template language
 
-16. Добавьте менеджер в модель Product.
+
+15. Добавьте менеджер в модель Product.
 
 Т.к. все товары, которые показываются пользователю, должно быть в наличии,
 сразу сделаем себе специальный менеджер. И заодно упорядочим товары так, как нам
@@ -658,7 +666,7 @@ Zeal:
 
 
 
-17. Создайте метод и шаблон для отображения списка товара. Настройте URL.
+16. Создайте метод и шаблон для отображения списка товара. Настройте URL.
 
 В products/views.py:
 
@@ -675,11 +683,176 @@ class ProductListView(ListView):
     <p><a href={{ object.get_absolute_url }}>{{ object.id }} {{ object.name }}</p>
 {% endfor %}
 
+
+В urls.py:
+path("products/", ProductListView.as_view(), name="product-list"),
+
 Обратите внимание:
 1) Работает магия: назовите правильно шаблон, и не придется писать его имя специально.
 Но если забылось, можно всегда указать явно template_name.
 2) Нам надо задействовать свой менеджер in_stock. Для этого вмешиваемся в работу алгоритма:
 переопределяем метод get_queryset.
+3) Обязательно расположить этот путь ниже, чем product-detail. Выбор маршрута
+идет сверху вниз, поэтому данный путь перехватит запрос на карточку товара, если его расположить
+выше.
 
 Для эксперимента: в админке товару поставьте нулевой остаток. И убедитесь, что
 товар пользователю не показывается.
+
+
+
+
+
+17. Создать в приложении general базовый шаблон.
+
+На general ПКМ / New / File / templates/general/base.html
+
+Открываем в Zeal любой материал про Bootstrap.
+Скроллим вниз и в футере находим Examples.
+
+Находим понравившийся шаблон. В данном случае - Pricing.
+Правой кнопкой мыши в любом месте. Открыть в браузере.
+Скопировать себе html.
+
+В Chrome:
+1) ctrl + u
+2) ctrl + a
+3) Переходим в base.html
+4) ctrl + v
+
+Очистить html:
+1) Бегло скроллим и удаляем js и css, которых нет
+в инфраструктурном листе.
+<script src="../../assets/js/color-modes.js"></script>
+<link rel="stylesheet" href="../../../../../cdn.jsdelivr.net/npm/%40docsearch/css%403.css">
+<link href="pricing.css" rel="stylesheet">
+
+2) Фавайконы кроме ico.
+<link rel="apple-touch-icon" href="../../assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" href="../../assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+<link rel="manifest" href="../../assets/img/favicons/manifest.json">
+<link rel="mask-icon" href="../../assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+
+В products/templates/product_detail.html первой строкой добавить:
+{% extends 'general/base.html' %}
+
+Проверить в работе, открыв карточку товара.
+Увидим пример из документации Bootstrap без стилей.
+Данных о нашем товаре - не видим.
+
+
+
+Документация: https://docs.djangoproject.com/en/5.0/ref/templates/language/#template-inheritance
+
+Zeal: template inheritance
+
+
+18. Подключить Bootstrap и jQuery.
+В приложении general создайте каталог static\general.
+Принцип тот же, что и с шаблонами: Django собирает статические файлы
+по всем каталогам static всех приложений. Но программисту надо знать,
+в каком приложении лежит конкретный файл. Проще всего это сделать,
+расположив файлы в каталоге наименованием приложения.
+
+В static\general создайте каталоги:
+    1) css
+    2) js
+
+Скопируйте в них файлы Bootstrap и jQuery.
+
+В base.html на первой строке пишем:
+{% load static %}
+
+Находим в general.html и меняем:
+
+1)
+<link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+на
+<link href="{% static 'general/css/bootstrap.min.css' %}" rel="stylesheet">
+
+2)
+<script src="../../dist/js/bootstrap.bundle.min.js"></script>
+на
+<script src="{% static 'general/js/bootstrap.bundle.min.js' %}"></script>
+
+В head
+<script src="{% static 'general/js/jquery.min.js' %}"></script>
+NB! В реальном проекте так не делается, потому что произойдет блокировка рендеринга.
+
+Проверить:
+1. Подключилось ли CSS.
+2. Верстка стала адаптивной.
+3. В консоли пишем jQuery, ошибок нет.
+4. Заработала кнопка переключения светлой и темной темы (т.е.
+заработал скрипт Bootstrap.
+
+Убрать кнопку переключения светлой и темной темы.
+
+На этом этапе в консоли Chrome нет ошибок кроме 404 для логотипа.
+
+Документация: https://docs.djangoproject.com/en/5.0/howto/static-files/
+Zeal: manage static
+
+
+19. Создать приложение companies.
+
+python manage.py startapp companies
+
+В INSTALLED_APPS добавляем companies.
+
+В нем создаем каталог static/companies/img
+
+
+20. Создать логотип и использовать в шаблоне.
+Открытая из Zeal страница в браузере внизу содержит логотип Bootstrap.
+Кликаем по нему правой кнопкой мыши, сохраняем.
+Открываем в InkScape.
+
+Букву "B" заменяем на уместную в данном случае "М".
+
+Меняем название файла на logo.svg.
+
+Создаем каталог для статики, в нем каталог img и помещаем в него логотип.
+
+Таким образом, в приложении companies:
+
+static/companies/img/logo.svg
+
+В шаблоне путь до логотипа в футере правим на:
+{% static 'companies/img/logo.svg' %}
+
+Получаем:
+<img class="mb-2" src="{% static 'companies/img/logo.svg' %}" alt="" width="24" height="19">
+
+Копируем этот элемент, ищем лого в хедере и заменяем svg на указанный выше.
+<img class="mb-2" src="{% static 'companies/img/logo.svg' %}" alt="" width="24" height="19">
+
+Правим:
+1) Удаляем марджин.
+2) Добавляем свой класс.
+3) Удаляем ширину и высоту:
+
+
+<img class="home-logo" src="{% static 'companies/img/logo.svg' %}">
+
+
+21. Подключить style.css и написать стиль для логотипа
+
+В приложении general в
+    static/general/css
+
+создадим файл style.css.
+
+В нем:
+
+.home-logo {
+    width: 2em;
+}
+
+
+В head шаблона base.html пишем:
+
+<link href="{% static 'general/css/style.css' %}" rel="stylesheet">
+
+Проверим в работе на карточке товара.
