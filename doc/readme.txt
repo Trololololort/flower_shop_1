@@ -779,6 +779,10 @@ Zeal: template inheritance
 В head
 <script src="{% static 'general/js/jquery.min.js' %}"></script>
 NB! В реальном проекте так не делается, потому что произойдет блокировка рендеринга.
+Нам это сейчас нужно для очень специфических задач. Забегая вперед:
+мы будем писать скрипт на jQuery непосредственно в html.
+Но как только мы напишем jQuery, сразу получим ошибку, потому что
+html отрендерится раньше, чем загрузится библиотека.
 
 Проверить:
 1. Подключилось ли CSS.
@@ -856,3 +860,7 @@ static/companies/img/logo.svg
 <link href="{% static 'general/css/style.css' %}" rel="stylesheet">
 
 Проверим в работе на карточке товара.
+
+
+22. Разбить base.html на header, footer, base.html
+
