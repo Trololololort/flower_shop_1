@@ -1010,7 +1010,7 @@ NB! Очень важно задать alt. Если не задать, буде
 <li>В наличии: {{ object.stock }}</li>
 <li>Категория/вид товара: {{ object.category }}</li>
 <li>Цвет: {{ object.color }}</li>
-<li>Страна-производитель: {{ object.country }}</li>
+<li>Страна-производитель: {{ object.origin }}</li>
 <li>Поступил в продажу: {{ object.added }}</li>
 
 ТЗ не требует от нас вывода этой информации в список товаров.
@@ -1045,7 +1045,7 @@ NB! Очень важно задать alt. Если не задать, буде
                 <li>В наличии: {{ object.stock }}</li>
                 <li>Категория/вид товара: {{ object.category }}</li>
                 <li>Цвет: {{ object.color }}</li>
-                <li>Страна-производитель: {{ object.country }}</li>
+                <li>Страна-производитель: {{ object.origin }}</li>
                 <li>Поступил в продажу: {{ object.added }}</li>
               </ul>
             </a>
@@ -1092,6 +1092,166 @@ Zeal: responsive images
 {% endblock %}
 
 
+27. Создать форму сортировки и фильтрации для каталога товаров
+
+В приложении products создадим файл const.py.
+
+SORT_CHOICES = {
+    "added": "Дата поступления в продажу",
+    "origin": "Страна происхождения",
+    "category": "Вид товара",
+    "price": "Цена",
+}
+
+Ключи - имена полей в модели Product.
+Значения - их представления для пользователя.
+Применяется в ProductSortFilterForm.
+Из формы получим выбор от пользователя - это будет
+какой-то из ключей. И удобно будет применить его для
+сортировки средствами ORM.
+
+Три варианта выбора для сортировки нам объявлено.
+И еще один - по дате поступления товара - упоминался как выбор по умолчанию.
+Поэтому мы его тоже включаем в список.
+
+
+В приложении products создадим файл forms.py. В нем:
+
+def get_choices():
+    choices = [(k, v) for k, v in SORT_CHOICES.items()]
+    return choices
+
+class ProductSortFilterForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].required = False
+
+    order_by = forms.ChoiceField(choices=get_choices, label="Сортировать по", required=False)
+
+
+    class Meta:
+        model = Product
+        fields = ["category"]
+        labels = {
+            "category": "Фильтр"
+        }
+
+В Django есть ModelForm: из модели делается форма.
+И особенностью является то, что если встретился в модели внешний ключ,
+то выпадающий список вариантов будет для нас подготовлен средствами Django
+из коробки. Так экономим время: иначе бы пришлось выбор категорий писать вручную.
+
+Поэтому берем модель Product. Она большая, а нам нужно из нее только категория.
+Поэтому fields = ["category"].
+
+Категория у товара в модели - обязательна к заполнению. А в форме - не обязательна.
+Поэтому так объявляем, для чего переопределим конструктор формы.
+
+Так как в модели Product ничего не было про сортировку, добавим поле order_by.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/forms/fields/#choicefield
+2) https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/
+
+Zeal:
+1) choicefield
+2) Creating forms from models
+
+
+
+28. Добавить форму сортировки и фильтрации в шаблон
+
+Форму надо добавить из view в контекст шаблона.
+Очень удобно копировать нужный участок кода из документации к TemplateView.
+
+Добавим в ProductListView:
+
+    def get_context_data(self, **kwargs):
+
+        context_data = super().get_context_data(**kwargs)
+        context_data["sort_filter_form"] = GoodsSortFilterForm(self.request.GET)
+        return context_data
+
+Дополним шаблон:
+
+    <div class="mb-5">
+        <form>
+            <table>
+                {{ sort_filter_form.as_table }}
+            </table>
+            <button>Показать</button>
+        </form>
+    </div>
+
+Обратите внимание: форма отправляет данные GET-запросом.
+Мы в контекст передаем всегда созданную заново форму GoodsSortFilterForm(self.request.GET).
+
+Мы могли бы создать форму, не передавая в нее параметры GET-запроса (вот так GoodsSortFilterForm()).
+Но мы бы потеряли выбор пользователя, потому что классический веб работает с перезагрузкой
+страницы. Потеря выбора пользователя недопустима.
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/forms/api/#checking-which-form-data-has-changed
+2) https://docs.djangoproject.com/en/5.0/ref/forms/api/#bound-and-unbound-forms
+
+Zeal:
+1) Checking which form data has changed
+2) Bound and unbound forms
+
+
+29. Доработать ProductListView, чтобы заработала сортировка и фильтрация
+
+Изменим метод get_queryset:
+
+    def get_queryset(self):
+        queryset = Product.in_stock.all()
+
+        category = self.request.GET.get("category")
+        order_by = self.request.GET.get("order_by")
+
+        if order_by:
+            if order_by == 'price' or order_by == 'added':
+                # По убыванию цены и даты добавления.
+                queryset = queryset.order_by("-" + order_by)
+
+            else:
+                assert (order_by == 'category' or order_by == 'origin')
+                queryset = queryset.order_by(order_by + "__name")
+
+        if category:
+            queryset = queryset.filter(category_id=category)
+
+        return queryset
+
+
+Мы во view, экземпляр класса знает о том запросе, который получен.
+Поэтому обращаемся к запросу, получаем категорию и имя поля, по которому упорядочивать.
+И применяем в запросе к базе данных через ORM.
+
+Объекты типа QuerySet можно дополнять новыми условиями (так сказать, сhaining,
+т.е. строить цепочку). Объекты ленивы, поэтому цепочку сначала готовим, а в базу данных
+запрос будет сделан сильно позже (например, когда надо будет выводить список,
+а это случится в шаблоне).
+
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/topics/db/queries/
+2) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#django.db.models.query.QuerySet.order_by
+3) https://docs.djangoproject.com/en/5.0/ref/models/querysets/#filter
+4) https://docs.djangoproject.com/en/5.0/topics/db/queries/#querysets-are-lazy
+
+Zeal:
+1) Making queries
+2) order_by
+3) Сначала в форме поиска ввести "Making queries", а потом ctrl + f "Retrieving specific objects with filters".
+4) QuerySets are lazy
+
+
 27. Доработка карточки товара в product_detail.html
 
 Добавим в product_detail.html
@@ -1114,7 +1274,7 @@ content, удалим.
 Многое некрасиво.
 
 А именно:
-1) Изображение занимает только част экрана.
+1) Изображение занимает только часть экрана.
 Исправим это, добавив класс w-100
 
 
@@ -1262,3 +1422,580 @@ Zeal:
 1) templateview
 2) Captions
 3) Autoplaying carousels
+
+29. Создать UserMixin.
+Мы предвидим, что пользователь нам нужен для двух моделей:
+1) Заказ.
+2) Корзина.
+
+Поэтому сразу в general/model_mixins.py:
+
+class UserMixin(models.Model):
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name="Пользователь", )
+
+    class Meta:
+        abstract = True
+
+
+29. Создать приложение orders и модель Order.
+
+python manage.py startapp orders
+
+Добавить orders в INSTALLED_APPS.
+
+В приложении orders создайте файл const.py.
+
+ORDER_STATUS = [
+    ("NEW", "Новый"),
+    ("CONFIRMED", "Подтвержден"),
+    ("CANCELLED", "Отменен"),
+]
+
+Создайте модель Order:
+
+class Order(UserMixin,
+            models.Model):
+
+    ordered = models.DateTimeField(auto_now_add=True,
+                                   verbose_name="Дата заказа")
+    status = models.CharField(max_length=9,
+                              choices=ORDER_STATUS,
+                              verbose_name="Статус",
+                              blank=True,
+                              null=False,
+                              default="NEW")
+
+    cancellation_cause = models.TextField(verbose_name="Причина отказа",
+                                          default="",
+                                          null=False,
+                                          blank=True)
+
+    def __str__(self):
+        return "{}".format(self.id)
+
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.DateTimeField
+2) https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.CharField
+3) https://docs.djangoproject.com/en/5.0/ref/models/fields/#choices
+4) https://docs.djangoproject.com/en/5.0/ref/models/fields/#textfield
+
+
+29. Создать приложение carts и модель Cart.
+
+python manage.py startapp carts
+
+Добавить carts в INSTALLED_APPS.
+
+Модель Cart:
+
+class Cart(UserMixin,
+           models.Model):
+    """
+    Пользователь добавляет товар в корзину.
+    Пока поле order пустое, товар в корзине.
+    Когда поле order непустое, это уже заказ.
+
+    Таким образом организуется и текущая корзина,
+    и история заказов.
+    """
+
+    product = models.ForeignKey("products.Product",
+                                  on_delete=models.CASCADE,
+                                  verbose_name="Товар")
+    # Магазин торгует только штучными товарами.
+    # Теоретически, возможна продажа весового товара (например, удобрений).
+    # Но для интернет-магазина это довольно странно. А т.к. в ТЗ ничего не сказано,
+    # поэтому трактуем самостоятельно: только штучный.
+    quantity = models.PositiveIntegerField(blank=False,
+                                           null=False,
+                                           default=0,
+                                           verbose_name="Количество")
+
+    order = models.ForeignKey("orders.Order",
+                              on_delete=models.CASCADE,
+                              null=True,
+                              blank=True, )
+
+    def price(self):
+        return self.product.price
+
+    def __str__(self):
+        return "{}".format(self.id)
+
+    class Meta:
+        verbose_name = "Товар в корзине"
+        verbose_name_plural = "Товары в корзинах"
+
+Зарегистрируем ее в административной панели:
+
+class CartAdmin(admin.ModelAdmin):
+    exclude = []
+    list_display = ["id", "user", "order", "product", "price", "quantity", ]
+
+
+admin.site.register(Cart, CartAdmin)
+
+
+30. Создайте view - метод-заглушку для добавления товара в корзину и соответствующий URL.
+
+class AddToCart(LoginRequiredMixin,
+                View):
+    def post(self, request):
+        return HttpResponse("Ok")
+
+Обратите внимание на LoginRequiredMixin.
+Просто добавив этот миксин, мы обеспечили невозможность
+обращения к этой view неавторизованному пользователю.
+
+Используем самый общий из классов для view - класс View.
+Причина: эта вьюшка  не будет отдавать того, для чего
+сделаны готовые классы (типа ListView или DetailView).
+
+От этой вьюшки нам надо задействовать  только метод post.
+
+Эта view будет:
+1) Выполнять редирект в случае успешного добавления товаров в корзину.
+2) Возвращать статус - ошибку в случае неудачи.
+
+В Django есть FormView, но она нам для упомянутых целей подходит плохо.
+
+
+В urlpatterns:
+
+    urlpatterns = [
+        path("cart/add/", AddToCart.as_view(), name="add-to-cart"),
+    ]
+
+Пока проверить не можем. Но проверка на дым - просто запустите.
+При наличии грубых ошибок даже запуститься не удастся.
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+2) https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpResponse
+
+Zeal:
+1) loginrequiredmixin
+2) HttpResponse
+
+
+
+30. Создайте форму для добавления товаров в корзину.
+
+В приложении carts создайте файл:
+
+templates/carts/parts /add_to_cart_form.html
+
+В нем:
+
+{% comment %}
+
+Необязательные: addend, button_text
+
+Пример использования:
+{% include 'carts/parts/add_to_cart_form.html' with product_id=object.id addend=-1 button_text="+" %}
+
+{% endcomment %}
+
+
+
+<form id="to-cart-form" class="to-cart-form" method="post" action="{% url 'add-to-cart' %}">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product_id }}">
+    <input type="hidden" name="addend" value="{{ addend|default:'1' }}">
+    <button id="to-cart-button" class="to-cart-button btn btn-primary">{{ button_text|default:"В корзину" }}</button>
+</form>
+
+Положить товар в корзину можно из каталога, из карточки и из самой корзины.
+Поэтому обособим этот функционал в отдельном файле.
+
+Здесь: addend - слагаемое. По умолчанию 1.
+В корзине можно еще и убрать товар - тогда передадим -1.
+
+В корзине мы будем делать две кнопки: + и -, поэтому можно передать еще и текст.
+
+Задействован фильтр default, документация ниже.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/howto/csrf/#how-to-use-django-s-csrf-protection
+2) https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#default
+3) https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#include
+
+Zeal:
+1) How to use Django’s CSRF protection
+2) default
+3) include
+
+
+31. В каталоге и карточке товаров предусмотрите, что только залогиненный пользователь
+видит кнопку "В корзину"
+
+В шаблоне:
+
+    {% if user.is_authenticated %}
+    <div class="card-footer py-3">
+        {% include 'carts/parts/add_to_cart_form.html' with product_id=object.id %}
+    </div>
+    {% endif %}
+
+В контексте шаблона есть пользователь. Вы можете его видеть по тегу {% debug %}.
+
+
+Попробуйте:
+1) Залогиненный пользователь видит кнопку. У вас есть сейчас один пользователь - admin.
+2) В режиме инкогнито кнопки не видны.
+3) В панели разработчика посмотрите, что в форме есть и слагаемое, и идентификатор продукта.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/contrib/auth/#django.contrib.auth.models.User.is_authenticated
+
+Zeal:
+1) is_authenticated
+
+
+32. Создайте функцию для добавления товара в корзину
+
+В carts создайте файл service.py. Причина: вьюшки должны быть тощими.
+
+В service.py:
+
+def add_product_to_cart(product_id, user, addend):
+    product = Product.in_stock.filter(pk=product_id).first()
+
+    assert product is not None
+
+    if product:
+
+        the_product_already_in_cart = Cart.objects.filter(user=user, product=product, order=None).first()
+
+        if the_product_already_in_cart:
+            the_product_already_in_cart.quantity = (the_product_already_in_cart.quantity + addend)
+
+            if the_product_already_in_cart.quantity == 0:
+                the_product_already_in_cart.delete()
+            else:
+                the_product_already_in_cart.save()
+
+        else:
+            Cart.objects.create(user=user, product=product, quantity=1)
+        status = 200
+
+        act = "добавлен в корзину" if addend > 0 else "убран из корзины"
+
+        message = 'Товар "{}" {}.'.format(product.name, act)
+    else:
+        # Страховка. Не должны сюда попасть.
+        status = 400
+        message = "Wrong product id"
+
+    return {"status": status, "message": message}
+
+Filter и first использованы - потому что так можно избежать необходимости
+обрабатывать исключение. Потому что метод альтернатива примерно такова:
+
+try:
+    Cart.objects.get(...
+except DoesNotExist:
+    ...
+
+Если продукт уже в корзине, увеличиваем его количество.
+Товары добавляются всегда по одному. ТЗ о другом ничего не говорит.
+
+Если в корзине 0 таких товаров, убираем товар из корзины.
+
+Возвращаем код и сообщение пользователю.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-a-single-object-with-get
+
+Zeal:
+1) Retrieving a single object with get
+
+
+32. Доработайте AddToCart: добавить товар в корзину
+
+    def post(self, request):
+        """
+        Добавить или убрать товар из корзины.
+        Если товар не может быть добавлен в корзину, сообщить об этом.
+
+        product_id - id товара.
+        addend - может быть +1 (добавить) или -1 (удалить).
+
+        Товар можно добавить из каталога, карточки товара и из корзины.
+        Т.е. из разных мест.
+        Поэтому сообщение показать на странице, где добавлялся товар.
+        """
+        product_id = request.POST.get('product_id')
+        addend = int(request.POST.get('addend'))
+
+        assert (addend == 1 or addend == -1)
+
+        status = add_product_to_cart(product_id, request.user, addend)
+
+        if status["status"] == 200:
+            messages.add_message(request, messages.INFO, status["message"])
+            return redirect(request.META['HTTP_REFERER'])
+        else:
+            return HttpResponse(status["message"], status=status["status"])
+
+
+Проверьте в работе: из каталога добавляем одинаковые и разные товары кнопкой "В корзину".
+
+Готовимся показать сообщение пользователю: добавим его в контекст.
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+2) https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
+
+Zeal:
+1) messages
+2) redirect
+
+
+33. Создайте отдельный файл с частью шаблона для отображения сообщения.
+
+В приложении general создайте шаблон message.html
+
+{% comment %}
+    Пример использования:
+    {% include 'general/message.html' %}
+{% endcomment %}
+
+
+{% if messages %}
+    {% for message in messages %}
+        <span class="d-block p-2 {% if message.tags == 'info' %}bg-success{% else %}bg-danger{% endif %} mb-3">{{ message }}</span>
+    {% endfor %}
+{% endif %}
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+2) https://getbootstrap.com/docs/4.0/utilities/colors/#background-color
+3) https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#if
+
+Zeal:
+1) messages
+2) color
+3) if
+
+
+34. Примените message.html в каталоге:
+
+
+{% block headline %}
+...
+
+{% include 'general/message.html' %}
+
+{% endblock %}
+
+Проверьте: из каталога добавьте товар. Сообщения должны появляться.
+
+Полностью функционал проверить на данном этапе слишком сложно.
+Можно: подменять значения на точке останова. Но это чересчур.
+Поэтому предупреждение с выводом сообщения об опасности не проверяем.
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+
+Zeal:
+1) messages
+
+
+36. Организуйте добавление товара в корзину из карточки товара
+
+В product_detail.html:
+
+1) Добавьте:
+
+{% block headline %}
+  {% include 'general/message.html' %}
+{% endblock %}
+
+2) Замените кнопку на:
+
+{% if user.is_authenticated %}
+    {% include 'carts/parts/add_to_cart_form.html' with product_id=object.id %}
+{% endif %}
+
+Проверьте: из карточки товара добавьте товар. Сообщения должны появляться.
+
+37. Создайте функцию для получения содержимого корзины
+
+В carts/service.py:
+
+def get_cart_contents(user):
+    """
+    В корзине лежат товары пользователя,
+    которым еще не создан заказ.
+    """
+    object_list = Cart.objects.filter(user=user).filter(order=None)
+
+    return object_list
+
+
+37. Создайте в первом приближении view для просмотра корзины.
+
+В первом приближении означает, что еще придется дорабатывать:
+будет еще функционал для формирования заказа.
+
+def get_total(a_queryset):
+    sum = 0
+    [sum := sum + elem.product.price * elem.quantity for elem in a_queryset]
+    return sum
+
+class CartDetailView(LoginRequiredMixin,
+                     TemplateView):
+    template_name = "carts/cart.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        object_list = get_cart_contents(self.request.user)
+        context["object_list"] = object_list
+        context["total"] = get_total(object_list)
+        return context
+
+Обратите внимание: пользователь в запросе присутствует.
+
+Django в шаблоне не может перемножать цифры.
+Чтобы имея количество и цену вычислить сумму, нужно писать
+собственный тэг для шаблона. Это долго. В ТЗ нет
+указания о том, что корзина должна содержать сумму построчно.
+
+Да, эта корзина будет хуже, чем возможно. Но принимаем на себя
+разумный риск: за это оценку, скорее всего, не снизят.
+
+А общую сумму для товаров в корзине считаем в функции get_total.
+
+Проверить работу метода можно на точке останова.
+
+
+38. Создайте в первом приближении шаблон для просмотра корзины.
+
+
+Создать заказ мы пока не сможем.
+
+Возьмем за основу таблицы тот же самый шаблон из примеров Bootstrap,
+который целиком лежит в основе нашего фронтенда.
+Он называется Pricing.
+
+Копируем эту таблицу и дорабатываем.
+
+
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block headline %}
+  {% include 'general/message.html' %}
+{% endblock %}
+
+
+{% block content %}
+
+
+
+{% if object_list %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Артикул</th>
+                <th scope="col">Наименование</th>
+                <th class="text-center" scope="col">Цена</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th class="text-center" scope="col">Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+                <tr>
+                    <td>{{ object.product.id }}</td>
+                    <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
+                    <td class="text-center">{{ object.product.price }}</td>
+                    <td class="text-end">
+                    {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+                    </td>
+
+                    <td class="text-start">
+                    {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+                    </td>
+
+                    <td class="text-center">{{ object.quantity }}</td>
+                </tr>
+            {% endfor %}
+        <tr>
+            <td style="background-color: var(--bs-dark-bg-subtle);" colspan="12"> </td>
+        </tr>
+        <tr>
+            <td colspan="3" >Сумма, руб.</td>
+            <td colspan="2" class="text-center">{{ total }}</td>
+            <td></td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+{% else %}
+
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">В корзине пока пусто</h1>
+</div>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+Документация:
+1) https://getbootstrap.com/docs/5.3/examples/pricing/
+
+
+38. Добавьте url для просмотра корзины
+
+urlpatterns = [
+    ...
+    path("cart/add/", AddToCart.as_view(), name="add-to-cart"),
+    path("cart/", CartDetailView.as_view(), name="cart-detail"),
+]
+
+Обязательно cart/ должно следовать за cart/add/ во избежания
+попадания не в ту вьюшку.
+
+Попробуйте: в корзине должны работать кнопки добавления и удаления товара.
+
+
+39. Добавьте стиль для кнопок добавления / удаления товаров
+
+.to-cart-button {
+    min-width: 2.5em;
+}
+
+Когда кнопки большие и с одинаковым текстом, все было неплохо.
+А в случае корзины символы "+" и "-" имеют разную ширину.
+И под палец на мобильных устройствах лучше больше простора.
+
+30. Создайте view для просмотра заказов.
+
+class OrdersListView(LoginRequiredMixin,
+                     ListView):
+    model = Order
+
+    def get_queryset(self):
+        result = Order.objects.filter(user=self.request.user).order_by(
+            "-ordered")
+        return result

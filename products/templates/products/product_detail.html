@@ -1,5 +1,9 @@
 {% extends 'general/base.html' %}
 
+{% block headline %}
+  {% include 'general/message.html' %}
+{% endblock %}
+
 {% block content %}
       <div class="col">
         <div class="card mb-4 rounded-3 shadow-sm">
@@ -17,11 +21,14 @@
                 <li>В наличии: {{ object.stock }}</li>
                 <li>Категория/вид товара: {{ object.category }}</li>
                 <li>Цвет: {{ object.color }}</li>
-                <li>Страна-производитель: {{ object.country }}</li>
+                <li>Страна-производитель: {{ object.origin }}</li>
                 <li>Поступил в продажу: {{ object.added }}</li>
               </ul>
             </a>
-            <button type="button" class="btn btn-lg btn-primary">В корзину</button>
+
+            {% if user.is_authenticated %}
+                {% include 'carts/parts/add_to_cart_form.html' with product_id=object.id %}
+            {% endif %}
           </div>
         </div>
       </div>

@@ -5,3 +5,7 @@
 .about-logo {
     width: 5em;
 }
+
+.to-cart-button {
+    min-width: 2.5em;
+}

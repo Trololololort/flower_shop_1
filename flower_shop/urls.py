@@ -19,6 +19,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
+from carts.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView
 from products.views import ProductDetailView, ProductListView
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
     path("products/", ProductListView.as_view(), name="product-list"),
     path("about/", AboutCompanyView.as_view(), name="about"),
+    path("cart/add/", AddToCart.as_view(), name="add-to-cart"),
+    path("cart/", CartDetailView.as_view(), name="cart-detail"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

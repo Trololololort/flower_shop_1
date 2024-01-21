@@ -1,0 +1,11 @@
+{% comment %}
+    Пример использования:
+    {% include 'general/parts/message.html' %}
+{% endcomment %}
+
+
+{% if messages %}
+    {% for message in messages %}
+        <span class="d-block p-2 {% if message.tags == 'info' %}bg-success{% else %}bg-danger{% endif %} mb-3">{{ message }}</span>
+    {% endfor %}
+{% endif %}

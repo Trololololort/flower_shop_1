@@ -1,0 +1,66 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block headline %}
+  {% include 'general/message.html' %}
+{% endblock %}
+
+
+{% block content %}
+
+
+
+{% if object_list %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+            <th scope="col">Артикул</th>
+            <th scope="col">Наименование</th>
+            <th class="text-center" scope="col">Цена</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th class="text-center" scope="col">Количество</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+        <tr>
+            <td>{{ object.product.id }}</td>
+            <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
+            <td class="text-center">{{ object.product.price }}</td>
+            <td class="text-end">
+            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+            </td>
+
+            <td class="text-start">
+            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+            </td>
+
+            <td class="text-center">{{ object.quantity }}</td>
+        </tr>
+        {% endfor %}
+
+
+        <tr>
+            <td style="background-color: var(--bs-dark-bg-subtle);" colspan="12"> </td>
+        </tr>
+        <tr>
+            <td colspan="3" >Сумма, руб.</td>
+            <td colspan="2" class="text-center">{{ total }}</td>
+            <td></td>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+{% else %}
+
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">В корзине пока пусто</h1>
+</div>
+
+{% endif %}
+
+
+{% endblock %}
