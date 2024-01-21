@@ -1137,6 +1137,7 @@ templates/companies/about.html
 
 В нем:
 {% extends 'general/base.html' %}
+{% load static %}
 
 Копируем из страницы каталга блок headline
 
@@ -1147,3 +1148,117 @@ templates/companies/about.html
   <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
 </div>
 {% endblock %}
+
+Дополним этот блок слоганом:
+<h2 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h2>
+
+И логотипом:
+<img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
+
+Создадим view:
+
+class AboutCompanyView(TemplateView):
+    template_name = "companies/about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_list"] = Product.in_stock.all()[:5]
+        return context
+
+
+
+Нам нужен object_list, в котором будет 5 последних добавленных товаров.
+Очень удобно - в документации к TemplateView все есть, как нам надо - доработать
+совсем немного.
+
+У нас in_stock уже отсортированы по новизне. Берем только последние 5.
+
+
+
+Дополним urlpatterns:
+
+urlpatterns = [
+    ...
+    path("about/", AboutCompanyView.as_view(), name="about"),
+]
+
+Дополним style.css:
+
+.about-logo {
+    width: 5em;
+}
+
+Для слайдера идем в Zeal:
+
+Симпатичен слайдер, который с надписями. Копируем, вставляем
+в about.html
+
+Оставляем только по одному элементу, который active, остальные убираем:
+ 1) carousel-item.
+ 2) carousel-indicators.
+
+ Добавляем класс carousel-dark.
+
+ 1. Пишем цикл.
+ 2. Пишем условие, что активным и aria-current по умолчанию будет нулевой элемент.
+
+
+ Если позже захотите, и будет время,
+ оберните все в условие: не показывать слайдер, если товаров нет.
+ Сейчас не тратим на это время: магазин же чем-то торгует, значит, товаров
+ не может не быть.
+
+
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block headline %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+  <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
+  <h2 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h2>
+
+  <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="carouselExampleCaptions" class="carousel carousel-dark slide" data-bs-ride="carousel">
+
+  <div class="carousel-indicators">
+    {% for object in object_list %}
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+    {% endfor %}
+  </div>
+  <div class="carousel-inner">
+    {% for object in object_list %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      <img src="{{ object.photo.url }}" class="d-block w-100" alt="{{ object.name }}">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>{{ object.name }}</h5>
+        <p>В продаже с {{ object.added }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+{% endblock %}
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#django.views.generic.base.TemplateView
+2) https://getbootstrap.com/docs/5.3/components/carousel/#captions
+3) https://getbootstrap.com/docs/5.3/components/carousel/#autoplaying-carousels
+
+Zeal:
+1) templateview
+2) Captions
+3) Autoplaying carousels
