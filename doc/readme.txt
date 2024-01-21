@@ -864,3 +864,53 @@ static/companies/img/logo.svg
 
 22. Разбить base.html на header, footer, base.html
 
+Создадим рядом с base.html:
+    1) header.html,
+    2) footer.html
+
+В base.htm поиском найдем </header>
+
+Все что выше - вырезать и вставить в header.html.
+
+В base.htm поиском найдем <footer. Все что ниже - вырезить и вставить в footer.html.
+
+Дописать в footer.html на первой строке:
+{% load static %}
+
+В base.html
+1) Первой строкой:
+{% include 'general/header.html' %}
+
+2) Последней строкой:
+{% include 'general/footer.html' %}
+
+Проверить на карточке товара: ничего для карточки не должно измениться.
+
+
+23. Перенести из base.html верстку в карточку товара.
+
+В base.html под
+
+{% include 'general/header.html' %}
+
+пишем:
+
+{% block content %}{% endblock %}
+
+Переносим верстку из base.html в product_detail.html и организуем блок:
+
+{% block content %}
+...
+Верстка
+...
+{% endblock %}
+
+Пусть наши предыдущие обращения к переменным вроде {{ object.name }} уйдут за блок.
+Теперь они не видны.
+
+Проверяем в работе на карточке товара: видим примерно то, что мы взяли как пример
+из документации Bootstrap.
+
+Документация: https://docs.djangoproject.com/en/5.0/ref/templates/language/#template-inheritance
+Zeal: django: template inheritance
+
