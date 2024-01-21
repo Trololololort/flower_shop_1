@@ -1,11 +1,29 @@
-<p>{{ object.name }}</p>
-<p>{{ object.added }}</p>
-<p>{{ object.photo.url }}</p>
-<p>{{ object.price }}</p>
-<p>{{ object.origin }}</p>
-<p>{{ object.color }}</p>
-<p>{{ object.category }}</p>
-<p>{{ object.stock }}</p>
+{% extends 'general/base.html' %}
 
+{% block content %}
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <a href="{{ object.get_absolute_url }}">
+            <div class="card-header py-3">
+              <img class="w-100 img-fluid" src="{{ object.photo.url }}" alt="{{ object.name }}">
+            </div>
+          </a>
+          <div class="card-body">
+            <a href="{{ object.get_absolute_url }}">
+              <h1 class="card-title pricing-card-title">{{ object.name }}</h1>
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>Артикул: {{ object.id }}</li>
+                <li>Цена: {{ object.price }}</li>
+                <li>В наличии: {{ object.stock }}</li>
+                <li>Категория/вид товара: {{ object.category }}</li>
+                <li>Цвет: {{ object.color }}</li>
+                <li>Страна-производитель: {{ object.country }}</li>
+                <li>Поступил в продажу: {{ object.added }}</li>
+              </ul>
+            </a>
+            <button type="button" class="btn btn-lg btn-primary">В корзину</button>
+          </div>
+        </div>
+      </div>
 
-
+{% endblock %}

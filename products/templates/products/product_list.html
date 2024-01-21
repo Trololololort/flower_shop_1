@@ -1,23 +1,37 @@
 {% extends 'general/base.html' %}
 
+{% block headline %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+  <h1 class="display-4 fw-normal text-body-emphasis">Каталог</h1>
+</div>
+{% endblock %}
+
+
 {% block content %}
 <main>
     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
       {% for object in object_list %}
       <div class="col">
         <div class="card mb-4 rounded-3 shadow-sm">
-          <div class="card-header py-3">
-            <h4 class="my-0 fw-normal">Pro</h4>
-          </div>
+          <a href="{{ object.get_absolute_url }}">
+            <div class="card-header py-3">
+              <img class="img-fluid" src="{{ object.photo.url }}" alt="{{ object.name }}">
+            </div>
+          </a>
           <div class="card-body">
-            <h1 class="card-title pricing-card-title">$15<small class="text-body-secondary fw-light">/mo</small></h1>
-            <ul class="list-unstyled mt-3 mb-4">
-              <li>20 users included</li>
-              <li>10 GB of storage</li>
-              <li>Priority email support</li>
-              <li>Help center access</li>
-            </ul>
-            <button type="button" class="w-100 btn btn-lg btn-primary">Get started</button>
+            <a href="{{ object.get_absolute_url }}">
+              <h1 class="card-title pricing-card-title">{{ object.name }}</h1>
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>Артикул: {{ object.id }}</li>
+                <li>Цена: {{ object.price }}</li>
+                <li>В наличии: {{ object.stock }}</li>
+                <li>Категория/вид товара: {{ object.category }}</li>
+                <li>Цвет: {{ object.color }}</li>
+                <li>Страна-производитель: {{ object.country }}</li>
+                <li>Поступил в продажу: {{ object.added }}</li>
+              </ul>
+            </a>
+            <button type="button" class="w-100 btn btn-lg btn-primary">В корзину</button>
           </div>
         </div>
       </div>
@@ -27,6 +41,3 @@
 {% endblock %}
 
 
-{% for object in object_list %}
-    <p><a href={{ object.get_absolute_url }}>{{ object.id }} {{ object.name }}</p>
-{% endfor %}

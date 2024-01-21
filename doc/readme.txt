@@ -431,8 +431,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # ... the rest of your URLconf goes here ...
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 
@@ -587,6 +586,7 @@ Zeal:
 
 13. Доработайте шаблон product_detail.html, чтобы отображал данные.
 
+<p>{{ object.id }}</p>
 <p>{{ object.name }}</p>
 <p>{{ object.added }}</p>
 <p>{{ object.photo.url }}</p>
@@ -944,6 +944,8 @@ Zeal: django: template inheritance
 И перед закрывающим тегом для ряда:
       {% endfor %}
 
+Цикл за блоком content удаляем.
+
 Проверяем в работе: по числу отображаемых товаров будут созданы карточки. Внимательно:
 отображаются только товары, которые есть вналичии.
 
@@ -958,11 +960,13 @@ Zeal: templatetag
 1. Две страны.
 2. Три цвета.
 3. Три категории.
-6. Шесть товаров.
+6. Семь товаров.
 
 Страны: Россия, Казахстан.
 Цвета: Красный, Зеленый, Белый / красный, Розовый, Белый.
 Категории: Цветы, Упаковка, Дополнительно.
+
+Семь товаров - потому что 5 для слайдера и еще чуть-чуть.
 
 Изображения, которые сейчас вам доступны в doc / images,
 уже подготовлены для web кроме bouquet-2.jpg.
@@ -985,4 +989,161 @@ Zeal: templatetag
 Проверить, как работает список товаров (должно быть количество
 карточек по числу товаров).
 
-25. Доработать заготовку списка товаров
+
+25. Доработать карточки в списке товаров
+В теге с элементом card-header расположим изображение товара вместо h4:
+<img src="{{ object.photo.url }}" alt="{{ object.name }}">
+
+NB! Очень важно задать alt. Если не задать, будет ошибка валидации.
+
+Изображение получилось выходящим за пределы карточек.
+
+Зададим класс img-fluid:
+
+<img class="img-fluid" src="{{ object.photo.url }}" alt="{{ object.name }}">
+
+Где класс card-title, пишем:
+
+Заменяем список:
+<li>Артикул: {{ object.id }}</li>
+<li>Цена: {{ object.price }}</li>
+<li>В наличии: {{ object.stock }}</li>
+<li>Категория/вид товара: {{ object.category }}</li>
+<li>Цвет: {{ object.color }}</li>
+<li>Страна-производитель: {{ object.country }}</li>
+<li>Поступил в продажу: {{ object.added }}</li>
+
+ТЗ не требует от нас вывода этой информации в список товаров.
+Но мы стараемся для удобства экзаменатора и, кстати, самого себя:
+так можно проверять, как работают фильтры и сортировки.
+
+Сейчас мы видим сортировку от новых товаров к старым.
+
+
+Изменим текст кнопки:
+<button type="button" class="w-100 btn btn-lg btn-primary">В корзину</button>
+
+Нажатие в любое место карточки (кроме кнопки) должно вести на
+детальную информацию о товаре.
+
+Обрамим нужные участки в тег <a>:
+
+1)
+          <a href="{{ object.get_absolute_url }}">
+            <div class="card-header py-3">
+              <img class="img-fluid" src="{{ object.photo.url }}" alt="{{ object.name }}">
+            </div>
+          </a>
+
+2)
+
+            <a href="{{ object.get_absolute_url }}">
+              <h1 class="card-title pricing-card-title">{{ object.name }}</h1>
+              <ul class="list-unstyled mt-3 mb-4">
+                <li>Артикул: {{ object.id }}</li>
+                <li>Цена: {{ object.price }}</li>
+                <li>В наличии: {{ object.stock }}</li>
+                <li>Категория/вид товара: {{ object.category }}</li>
+                <li>Цвет: {{ object.color }}</li>
+                <li>Страна-производитель: {{ object.country }}</li>
+                <li>Поступил в продажу: {{ object.added }}</li>
+              </ul>
+            </a>
+
+Стиль текста поменялся на стиль ссылок. Пока не исправляем, дальше делаем MVP.
+
+
+
+Документация: https://getbootstrap.com/docs/4.0/content/images/#responsive-images
+Zeal: responsive images
+
+
+26. Организуем заголовок для списка товаров
+
+Заголовок страницы (h1) остался в header.html.
+
+В header.html сначала обрамим контейнер с заголовком в блок headline:
+
+{% block headline %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+  <h1 class="display-4 fw-normal text-body-emphasis">Pricing</h1>
+  <p class="fs-5 text-body-secondary">Quickly build an effective pricing table for your potential customers with this Bootstrap example. It’s built with default Bootstrap components and utilities with little customization.</p>
+</div>
+{% endblock %}
+
+Вырежем этот блок, вставим в product_list.html.
+
+А в base.html втавим только пустой блок:
+
+{% block headline %}
+{% endblock %}
+
+Причина переноса блока: Django не поддерживает блоки в
+файлах, подключенных через include.
+
+Проверим.
+
+Теперь изменим содержимое блока:
+
+{% block headline %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+  <h1 class="display-4 fw-normal text-body-emphasis">Каталог</h1>
+</div>
+{% endblock %}
+
+
+27. Доработка карточки товара в product_detail.html
+
+Добавим в product_detail.html
+
+{% extends 'general/base.html' %}
+
+{% block content %}
+{% endblock %}
+
+Карточка товара в каталоге нам подходит по содержанию.
+Скопируем ее из product_list.html (все содержимое цикла for) и
+вставим блок content в product_detail.html.
+
+Старое содержание карточки, которое сейчас оказалось вне блока
+content, удалим.
+
+Проверим.
+
+Карточка занимает всю ширину экрана.
+Многое некрасиво.
+
+А именно:
+1) Изображение занимает только част экрана.
+Исправим это, добавив класс w-100
+
+
+<img class="w-100 img-fluid" src="{{ object.photo.url }}" alt="{{ object.name }}">
+
+2) Кнопка растянута на всю ширину экрана.
+
+Уберем у нее класс w-100.
+
+<button type="button" class="btn btn-lg btn-primary">В корзину</button>
+
+
+
+28. Создать страницу "О нас"
+
+Щелчок правой кнопкой мыши на companies.
+New / File
+
+templates/companies/about.html
+
+В нем:
+{% extends 'general/base.html' %}
+
+Копируем из страницы каталга блок headline
+
+Вставляем, меняем текстh1:
+
+{% block headline %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+  <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
+</div>
+{% endblock %}
