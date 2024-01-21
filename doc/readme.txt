@@ -887,7 +887,7 @@ static/companies/img/logo.svg
 Проверить на карточке товара: ничего для карточки не должно измениться.
 
 
-23. Перенести из base.html верстку в карточку товара.
+23. Перенести из base.html верстку в шаблон списка товара.
 
 В base.html под
 
@@ -897,7 +897,7 @@ static/companies/img/logo.svg
 
 {% block content %}{% endblock %}
 
-Переносим верстку из base.html в product_detail.html и организуем блок:
+Переносим верстку из base.html в product_list.html и организуем блок:
 
 {% block content %}
 ...
@@ -905,10 +905,14 @@ static/companies/img/logo.svg
 ...
 {% endblock %}
 
-Пусть наши предыдущие обращения к переменным вроде {{ object.name }} уйдут за блок.
-Теперь они не видны.
 
-Проверяем в работе на карточке товара: видим примерно то, что мы взяли как пример
+На первой строке пишем:
+{% extends 'general/base.html' %}
+
+Пусть наш цикл уйдет за блок.
+Теперь он не виден.
+
+Проверяем в работе на списке товаров: видим примерно то, что мы взяли как пример
 из документации Bootstrap.
 
 Документация: https://docs.djangoproject.com/en/5.0/ref/templates/language/#template-inheritance
