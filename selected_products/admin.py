@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from carts.models import SelectedProduct
+from selected_products.models import SelectedProduct
 
 
 class CartAdmin(admin.ModelAdmin):

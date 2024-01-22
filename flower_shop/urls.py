@@ -19,7 +19,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from carts.views import AddToCart, CartDetailView
+from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView
 from products.views import ProductDetailView, ProductListView

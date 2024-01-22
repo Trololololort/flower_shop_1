@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from carts.models import SelectedProduct
+from selected_products.models import SelectedProduct
 from orders.models import Order
 
 

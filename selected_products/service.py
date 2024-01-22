@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from carts.models import SelectedProduct
+from selected_products.models import SelectedProduct
 from products.models import Product
 
 

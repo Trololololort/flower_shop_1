@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 
-from carts.service import add_product_to_cart, get_cart_contents
+from selected_products.service import add_product_to_cart, get_cart_contents
 from general.services import get_total
 from orders.forms import OrderForm
 
@@ -41,7 +41,7 @@ class AddToCart(LoginRequiredMixin,
 
 class CartDetailView(LoginRequiredMixin,
                      TemplateView):
-    template_name = "carts/cart.html"
+    template_name = "selected_products/cart.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
