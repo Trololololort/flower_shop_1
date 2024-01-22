@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.urls import reverse
 
 from general.model_mixins import UserMixin
 from orders.const import ORDER_STATUS
@@ -23,6 +24,8 @@ class Order(UserMixin,
                                           null=False,
                                           blank=True)
 
+    def get_absolute_url(self):
+        return reverse('order-detail', kwargs={"pk": self.id})
     def __str__(self):
         return "{}".format(self.id)
 

@@ -15,8 +15,8 @@ class Cart(UserMixin,
     """
 
     product = models.ForeignKey("products.Product",
-                                  on_delete=models.CASCADE,
-                                  verbose_name="Товар")
+                                on_delete=models.CASCADE,
+                                verbose_name="Товар")
     # Магазин торгует только штучными товарами.
     # Теоретически, возможна продажа весового товара (например, удобрений).
     # Но для интернет-магазина это довольно странно. А т.к. в ТЗ ничего не сказано,
@@ -27,9 +27,9 @@ class Cart(UserMixin,
                                            verbose_name="Количество")
 
     order = models.ForeignKey("orders.Order",
-                              on_delete=models.CASCADE,
-                              null=True,
-                              blank=True, )
+                                 on_delete=models.CASCADE,
+                                 null=True,
+                                 blank=True, )
 
     def price(self):
         return self.product.price

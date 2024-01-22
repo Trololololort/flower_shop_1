@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from orders.models import Order
 from orders.service import create_order
@@ -14,7 +14,6 @@ class CreateOrder(LoginRequiredMixin,
                   View):
 
     def post(self, request):
-
         user = request.user
         password = request.POST.get("password")
 
@@ -34,3 +33,18 @@ class CreateOrder(LoginRequiredMixin,
 class OrdersListView(LoginRequiredMixin,
                      ListView):
     model = Order
+
+    def get_queryset(self):
+        result = Order.objects.filter(user=self.request.user).order_by(
+            "-ordered")
+        return result
+
+
+class OrderDetailView(LoginRequiredMixin,
+                      DetailView):
+    model = Order
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["products"] = self.object.cart_set.values_list("product")
+        return context

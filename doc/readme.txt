@@ -1834,6 +1834,8 @@ Django в шаблоне не может перемножать цифры.
 Проверить работу метода можно на точке останова.
 
 
+
+
 38. Создайте в первом приближении шаблон для просмотра корзины.
 
 
@@ -1844,7 +1846,6 @@ Django в шаблоне не может перемножать цифры.
 Он называется Pricing.
 
 Копируем эту таблицу и дорабатываем.
-
 
 {% extends 'general/base.html' %}
 {% load static %}
@@ -1862,32 +1863,34 @@ Django в шаблоне не может перемножать цифры.
 <div class="table-responsive">
     <table class="table table-striped table-sm">
         <thead>
-            <tr>
-                <th scope="col">Артикул</th>
-                <th scope="col">Наименование</th>
-                <th class="text-center" scope="col">Цена</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-                <th class="text-center" scope="col">Количество</th>
-            </tr>
+        <tr>
+            <th scope="col">Артикул</th>
+            <th scope="col">Наименование</th>
+            <th class="text-center" scope="col">Цена</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th class="text-center" scope="col">Количество</th>
+        </tr>
         </thead>
         <tbody>
-            {% for object in object_list %}
-                <tr>
-                    <td>{{ object.product.id }}</td>
-                    <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
-                    <td class="text-center">{{ object.product.price }}</td>
-                    <td class="text-end">
-                        {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
-                    </td>
+        {% for object in object_list %}
+        <tr>
+            <td>{{ object.product.id }}</td>
+            <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
+            <td class="text-center">{{ object.product.price }}</td>
+            <td class="text-end">
+            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+            </td>
 
-                    <td class="text-start">
-                        {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
-                    </td>
+            <td class="text-start">
+            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+            </td>
 
-                    <td class="text-center">{{ object.quantity }}</td>
-                </tr>
-            {% endfor %}
+            <td class="text-center">{{ object.quantity }}</td>
+        </tr>
+        {% endfor %}
+
+
         <tr>
             <td style="background-color: var(--bs-dark-bg-subtle);" colspan="12"> </td>
         </tr>
@@ -1905,15 +1908,38 @@ Django в шаблоне не может перемножать цифры.
 <div class="px-4 py-5 my-5 text-center">
     <h1 class="display-5 fw-bold text-body-emphasis">В корзине пока пусто</h1>
 </div>
-
 {% endif %}
 
+{% include 'orders/order_form.html' %}
 
 {% endblock %}
 
 
+
 Документация:
 1) https://getbootstrap.com/docs/5.3/examples/pricing/
+
+
+38. Вычлените в шаблоне сумму
+
+Сумма нам понадобится также в заказе. Поэтому в приложении general создадим шаблон total.html.
+
+{% comment %}
+{% include 'general/total.html' %}
+{% endcomment %}
+
+<tr>
+    <td style="background-color: var(--bs-dark-bg-subtle);" colspan="12"> </td>
+</tr>
+<tr>
+    <td colspan="3" >Сумма, руб.</td>
+    <td colspan="2" class="text-center">{{ total }}</td>
+    <td></td>
+</tr>
+
+
+В шаблоне cart.html вместо этого участка кода:
+{% include 'general/total.html' %}
 
 
 38. Добавьте url для просмотра корзины
@@ -2001,7 +2027,7 @@ class PasswordField(forms.CharField):
     widget = forms.PasswordInput
 
 class OrderForm(forms.Form):
-    password = PasswordField()
+     password = PasswordField(label="Пароль")
 
 
 В Django нет специального поля для ввода пароля. Поэтому создаем собственное
@@ -2009,10 +2035,11 @@ class OrderForm(forms.Form):
 
 Документация:
 1) https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#passwordinput
+2) https://docs.djangoproject.com/en/5.0/ref/forms/fields/#label
 
 Zeal:
 1) passwordinput
-
+2) label
 
 42. Создайте заглушки view и url для создания заказа и для просмотра списка заказов.
 
@@ -2177,3 +2204,168 @@ Zeal:
 
 44. Добавьте вью для просмотра списка заказов.
 
+class OrdersListView(LoginRequiredMixin,
+                     ListView):
+    model = Order
+
+45. Добавьте заглушку шаблона для просмотра списка товаров.
+
+В файле templates/orders/order_list.html написать любой текст.
+Например, "Order list".
+
+46. Проверьте создание заказ в работе
+
+При вводе неправильного пароля должно выводиться соответствующее сообщение.
+Его цвет должен быть красным.
+
+47. Дополните OrderListView функционалом сортировки заказов
+
+Заказы должны выводиться от новых к старым.
+
+    Дополните OrderListView:
+
+
+    def get_queryset(self):
+        result = Order.objects.filter(user=self.request.user).order_by(
+            "-ordered")
+        return result
+
+
+
+
+49. Создайте заглушку метода OrderDetailView. Создайте URL.
+
+class OrderDetailView(LoginRequiredMixin,
+                      DetailView):
+    model = Order
+
+
+
+path("orders/<str:pk>/", OrderDetailView.as_view(), name="order-detail"),
+
+50. Дополните модель Order методом get_absolute_url.
+
+    def get_absolute_url(self):
+        return reverse('order-detail', kwargs={"pk": self.id})
+
+
+50. Создайте заглушку шаблона order_detail.html
+
+{% extends 'general/base.html' %}
+
+{% block content %}
+Order detail.
+{% endblock %}
+
+
+
+
+48. Сверстайте шаблон списка заказов в первом приближении
+
+Функционал удаления заказов пока реализовывать не будем.
+
+{% extends 'general/base.html' %}
+
+{% block content %}
+{% include 'general/message.html' %}
+
+<div class="table-responsive small">
+    {% if object_list %}
+    <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Заказ</th>
+            <th scope="col">Время заказа</th>
+            <th scope="col">Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for obj in object_list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><a href="{{ obj.get_absolute_url }}">{{ obj.pk}} </a></td>
+            <td>{{ obj.ordered }}</td>
+            <td>{{ obj.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="display-6 text-center mb-4">Нет заказов.</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+50. Создайте в первом приближении шаблон просмотра заказа.
+
+Пока не реализуем удаление нового заказа.
+
+
+{% extends 'general/base.html' %}
+
+{% block headline %}
+<h1>Заказ</h1>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <tbody>
+        <tr>
+            <td>Номер заказа</td>
+            <td>{{ order.id }}</td>
+        </tr>
+        <tr>
+            <td>Дата размещения</td>
+            <td>{{ order.ordered }}</td>
+        </tr>
+        <tr>
+            <td>Статус</td>
+            <td>{{ order.get_status_display }}</td>
+        </tr>
+        {% if order.status == 'CANCELLED' %}
+        <tr>
+            <td>Причина отказа</td>
+            <td>{{ order.cancellation_cause }}</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+
+    <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Артикул</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Цена, руб.</th>
+            <th scope="col">Количество, шт.</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for obj in goods%}
+        <tr>
+            <td scope="col">{{ forloop.counter }}</td>
+            <td scope="col">{{ obj.id }}</td>
+            <td scope="col">{{ obj.goods.name }}</td>
+            <td scope="col">{{ obj.price }}</td>
+            <td scope="col">{{ obj.quantity }}</td>
+        </tr>
+
+
+        {% endfor %}
+
+        {% include 'carts/parts/total.html' %}
+        </tbody>
+    </table>
+
+</div>
+
+
+
+{% endblock %}

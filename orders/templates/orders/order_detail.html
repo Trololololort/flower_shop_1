@@ -1,0 +1,62 @@
+{% extends 'general/base.html' %}
+
+{% block headline %}
+<h1>Заказ</h1>
+{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <tbody>
+        <tr>
+            <td>Номер заказа</td>
+            <td>{{ order.id }}</td>
+        </tr>
+        <tr>
+            <td>Дата размещения</td>
+            <td>{{ order.ordered }}</td>
+        </tr>
+        <tr>
+            <td>Статус</td>
+            <td>{{ order.get_status_display }}</td>
+        </tr>
+        {% if order.status == 'CANCELLED' %}
+        <tr>
+            <td>Причина отказа</td>
+            <td>{{ order.cancellation_cause }}</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+
+    <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Артикул</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Цена, руб.</th>
+            <th scope="col">Количество, шт.</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for obj in goods%}
+        <tr>
+            <td scope="col">{{ forloop.counter }}</td>
+            <td scope="col">{{ obj.id }}</td>
+            <td scope="col">{{ obj.cart.prooduct__set.name }}</td>
+            <td scope="col">{{ obj.price }}</td>
+            <td scope="col">{{ obj.quantity }}</td>
+        </tr>
+
+
+        {% endfor %}
+
+        {% include 'general/total.html' %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

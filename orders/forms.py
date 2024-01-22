@@ -5,4 +5,4 @@ class PasswordField(forms.CharField):
     widget = forms.PasswordInput
 
 class OrderForm(forms.Form):
-    password = PasswordField()
+    password = PasswordField(label="Пароль")
