@@ -1995,15 +1995,17 @@ class Order(UserMixin,
 
 В приложении orders создайте файл forms.py.
 
+В нем:
+
+class PasswordField(forms.CharField):
+    widget = forms.PasswordInput
+
 class OrderForm(forms.Form):
-    password = forms.CharField(
-        label="Пароль",
-        strip=False,
-        widget=forms.PasswordInput(widget=forms.PasswordInput()),
-    )
+    password = PasswordField()
 
 
-В Django нет специальной формы для ввода пароля. Поэтому применяется виджет.
+В Django нет специального поля для ввода пароля. Поэтому создаем собственное
+поле, в котором применяется виджет.
 
 Документация:
 1) https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#passwordinput
@@ -2074,33 +2076,104 @@ Zeal:
 
 class CreateOrder(LoginRequiredMixin,
                   View):
-
     def post(self, request):
 
         user = request.user
         password = request.POST.get("password")
 
-        try:
-            validate_password(password=password, user=user)
-        except ValidationError:
+        password_correct_for_user = auth.authenticate(request, username=user.username, password=password)
+
+        if not password_correct_for_user:
             messages.add_message(request, messages.ERROR, "Неверный пароль")
             return redirect("cart-detail")
 
         new_order_id = create_order(user)
 
-        messages.add_message(request, messages.ERROR, "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
+        messages.add_message(request, messages.INFO, "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
 
         return redirect("orders-list")
 
 
-Есть готовая функция validate_password
-
-(from django.contrib.auth.password_validation import validate_password).
+Есть готовый метод authenticate.
 
 Заказ формируется только из корзины. Поэтому об ошибке валидации сообщаем
 в CartDetail.
 
 Если заказ создать удалось, редирект на список заказов.
 
-Если будет выброшено исключение ValidationError, то в админке будет
-выведено сообщение.
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/topics/auth/default/#authenticating-users
+
+Zeal:
+1) authenticate
+
+
+
+44. Доработайте CartDetailView - передайте в контекст форму с паролем.
+
+class CartDetailView(LoginRequiredMixin,
+                     TemplateView):
+    ...
+
+    def get_context_data(self, **kwargs):
+        ...
+        context["order_form"] = OrderForm()
+        ...
+        return context
+
+
+45. Добавьте форму создания заказа в корзину
+
+В приложении orders создайте:
+
+templates/orders/order_form.html
+
+
+В нем:
+
+{% comment %}
+
+{% include 'orders/order_form.html' %}
+
+{% endcomment %}
+
+
+
+{% if object_list %}
+
+<form id="create-order" class="row g-3 mt-3" method="post" action="{% url 'create-order' %}">
+    {% csrf_token %}
+
+    <div class="col-md-4">
+        {{ order_form }}
+
+        <button class="btn btn-primary mt-3" type="submit">Сформировать заказ</button>
+
+    </div>
+</form>
+
+{% endif %}
+
+Идет запрос на модификацию данных. Поэтому метод - POST.
+
+Мы обязаны указать action, потому что запрос будет направлен
+не в ту view, которая отрендерила шаблон. Иначе говоря, отрендерило шаблон приложение
+CartDetailView, а запрос будет отправлен в CreateOrder.
+
+В cart.html после условия:
+
+{% include 'orders/order_form.html' %}
+
+
+
+
+Документация:
+1) https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#url
+
+Zeal:
+1) Built-in tag reference    , дальше поиском - "url".
+
+
+44. Добавьте вью для просмотра списка заказов.
+

@@ -7,6 +7,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from carts.service import add_product_to_cart, get_cart_contents
+from orders.forms import OrderForm
 
 
 class AddToCart(LoginRequiredMixin,
@@ -50,6 +51,7 @@ class CartDetailView(LoginRequiredMixin,
         context = super().get_context_data(**kwargs)
         object_list = get_cart_contents(self.request.user)
         context["object_list"] = object_list
+        context["order_form"] = OrderForm()
         context["total"] = get_total(object_list)
         return context
 

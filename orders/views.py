@@ -1,4 +1,4 @@
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -18,9 +18,9 @@ class CreateOrder(LoginRequiredMixin,
         user = request.user
         password = request.POST.get("password")
 
-        try:
-            validate_password(password=password, user=user)
-        except ValidationError:
+        password_correct_for_user = auth.authenticate(request, username=user.username, password=password)
+
+        if not password_correct_for_user:
             messages.add_message(request, messages.ERROR, "Неверный пароль")
             return redirect("cart-detail")
 

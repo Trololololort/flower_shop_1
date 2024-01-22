@@ -1,0 +1,22 @@
+{% comment %}
+
+{% include 'orders/order_form.html' %}
+
+{% endcomment %}
+
+
+
+{% if object_list %}
+
+<form id="create-order" class="row g-3 mt-3" method="post" action="{% url 'create-order' %}">
+    {% csrf_token %}
+
+    <div class="col-md-4">
+        {{ order_form }}
+
+        <button class="btn btn-primary mt-3" type="submit">Сформировать заказ</button>
+
+    </div>
+</form>
+
+{% endif %}
