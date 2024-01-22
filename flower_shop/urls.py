@@ -31,8 +31,8 @@ urlpatterns = [
     path("about/", AboutCompanyView.as_view(), name="about"),
     path("cart/add/", AddToCart.as_view(), name="add-to-cart"),
     path("cart/", CartDetailView.as_view(), name="cart-detail"),
-    path("orders/<str:pk>/", OrderDetailView.as_view(), name="order-detail"),
     path("orders/create/", CreateOrder.as_view(), name="create-order"),
+    path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
     path("orders/", OrdersListView.as_view(), name="orders-list"),
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

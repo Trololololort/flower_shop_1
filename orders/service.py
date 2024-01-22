@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from carts.models import Cart
+from carts.models import SelectedProduct
 from orders.models import Order
 
 
@@ -10,7 +10,7 @@ def create_order(user):
     Создать заказ и обновить корзину (добавить значение для внешнего ключа - номер заказа).
 
     """
-    carts = Cart.objects.filter(user=user, order=None)
+    carts = SelectedProduct.objects.filter(user=user, order=None)
 
     new_order = Order.objects.create(user=user)
 

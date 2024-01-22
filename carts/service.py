@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from carts.models import Cart
+from carts.models import SelectedProduct
 from products.models import Product
 
 
@@ -9,7 +9,7 @@ def get_cart_contents(user):
     В корзине лежат товары пользователя,
     которым еще не создан заказ.
     """
-    object_list = Cart.objects.filter(user=user).filter(order=None)
+    object_list = SelectedProduct.objects.filter(user=user).filter(order=None)
 
     return object_list
 
@@ -20,7 +20,7 @@ def add_product_to_cart(product_id, user, addend):
 
     if product:
 
-        the_product_already_in_cart = Cart.objects.filter(user=user, product=product, order=None).first()
+        the_product_already_in_cart = SelectedProduct.objects.filter(user=user, product=product, order=None).first()
 
         if the_product_already_in_cart:
             the_product_already_in_cart.quantity = (the_product_already_in_cart.quantity + addend)
@@ -31,7 +31,7 @@ def add_product_to_cart(product_id, user, addend):
                 the_product_already_in_cart.save()
 
         else:
-            Cart.objects.create(user=user, product=product, quantity=1)
+            SelectedProduct.objects.create(user=user, product=product, quantity=1)
         status = 200
 
         act = "добавлен в корзину" if addend > 0 else "убран из корзины"

@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 
 from carts.service import add_product_to_cart, get_cart_contents
+from general.services import get_total
 from orders.forms import OrderForm
 
 
@@ -37,11 +38,6 @@ class AddToCart(LoginRequiredMixin,
         else:
             return HttpResponse(status["message"], status=status["status"])
 
-
-def get_total(a_queryset):
-    sum = 0
-    [sum := sum + elem.product.price * elem.quantity for elem in a_queryset]
-    return sum
 
 class CartDetailView(LoginRequiredMixin,
                      TemplateView):

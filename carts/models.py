@@ -3,15 +3,13 @@ from django.db import models
 from general.model_mixins import UserMixin
 
 
-class Cart(UserMixin,
-           models.Model):
+class SelectedProduct(UserMixin,
+                      models.Model):
     """
-    Пользователь добавляет товар в корзину.
+    Пользователь отобрал товар.
     Пока поле order пустое, товар в корзине.
-    Когда поле order непустое, это уже заказ.
-
-    Таким образом организуется и текущая корзина,
-    и история заказов.
+    Когда поле order непустое, это уже
+    совершенный заказ.
     """
 
     product = models.ForeignKey("products.Product",
@@ -38,5 +36,5 @@ class Cart(UserMixin,
         return "{}".format(self.id)
 
     class Meta:
-        verbose_name = "Товар в корзине"
-        verbose_name_plural = "Товары в корзинах"
+        verbose_name = "Отобранный товар"
+        verbose_name_plural = "Отобранные товары"

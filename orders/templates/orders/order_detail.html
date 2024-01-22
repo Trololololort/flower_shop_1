@@ -41,13 +41,13 @@
         </tr>
         </thead>
         <tbody>
-        {% for obj in goods%}
+        {% for object in object_list%}
         <tr>
             <td scope="col">{{ forloop.counter }}</td>
-            <td scope="col">{{ obj.id }}</td>
-            <td scope="col">{{ obj.cart.prooduct__set.name }}</td>
-            <td scope="col">{{ obj.price }}</td>
-            <td scope="col">{{ obj.quantity }}</td>
+            <td scope="col">{{ object.id }}</td>
+            <td scope="col">{{ object.product.name }}</td>
+            <td scope="col">{{ object.price }}</td>
+            <td scope="col">{{ object.quantity }}</td>
         </tr>
 
 

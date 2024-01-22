@@ -1,18 +1,16 @@
 from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
 
+from general.services import get_total
 from orders.models import Order
 from orders.service import create_order
 
 
 class CreateOrder(LoginRequiredMixin,
                   View):
-
     def post(self, request):
         user = request.user
         password = request.POST.get("password")
@@ -46,5 +44,6 @@ class OrderDetailView(LoginRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = self.object.cart_set.values_list("product")
+        context["object_list"] = self.object.selectedproduct_set.all()
+        context["total"] = get_total(context["object_list"])
         return context

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from carts.models import Cart
+from carts.models import SelectedProduct
 
 
 class CartAdmin(admin.ModelAdmin):
@@ -8,4 +8,4 @@ class CartAdmin(admin.ModelAdmin):
     list_display = ["id", "user", "order", "product", "price", "quantity", ]
 
 
-admin.site.register(Cart, CartAdmin)
+admin.site.register(SelectedProduct, CartAdmin)
