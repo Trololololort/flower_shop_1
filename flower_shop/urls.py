@@ -15,9 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include, reverse_lazy
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
@@ -25,7 +26,10 @@ from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrd
 from products.views import ProductDetailView, ProductListView
 
 urlpatterns = [
+    path("", ProductListView.as_view(), name="home"),
     path('admin/', admin.site.urls),
+    path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('product-list'), permanent=False)),
+    path("accounts/", include("django.contrib.auth.urls")),
     path('contacts/', ContactsView.as_view(), name="contacts"),
     path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
     path("products/", ProductListView.as_view(), name="product-list"),
@@ -36,5 +40,6 @@ urlpatterns = [
     path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
     path("orders/delete/", DeleteOrder.as_view(), name="delete-order"),
     path("orders/", OrdersListView.as_view(), name="orders-list"),
+
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
