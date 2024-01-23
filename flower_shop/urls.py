@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 
+from accounts.views import SignUpView
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
@@ -28,6 +29,8 @@ from products.views import ProductDetailView, ProductListView
 urlpatterns = [
     path("", ProductListView.as_view(), name="home"),
     path('admin/', admin.site.urls),
+
+    path("accounts/signup/", SignUpView.as_view(), name="signup"),
     path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('home'), permanent=False)),
     path("accounts/", include("django.contrib.auth.urls")),
     path('contacts/', ContactsView.as_view(), name="contacts"),

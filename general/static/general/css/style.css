@@ -9,3 +9,8 @@
 .to-cart-button {
     min-width: 2.5em;
 }
+
+a {
+    color: purple !important;
+    text-decoration: none !important;
+}
