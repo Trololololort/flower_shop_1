@@ -20,12 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from selected_products.views import AddToCart, CartDetailView
-from companies.views import AboutCompanyView
+from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView
 from products.views import ProductDetailView, ProductListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('contacts/', ContactsView.as_view(), name="contacts"),
     path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
     path("products/", ProductListView.as_view(), name="product-list"),
     path("about/", AboutCompanyView.as_view(), name="about"),

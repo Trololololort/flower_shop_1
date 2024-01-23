@@ -1,0 +1,31 @@
+{% extends "general/base.html" %}
+{% load static %}
+
+{% block headline %}
+    <h1 class="text-center">Где нас найти?</h1>
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+      <h1 class="display-4 fw-normal text-body-emphasis">Мир цветов</h1>
+</div>
+
+<div class="card text-center">
+    <div class="card-header">
+        <img class="w-100" src="{% static 'companies/img/map.webp' %}" alt="{{ object.name }}"/>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Адрес: Санкт-Петербург, ул. 3-я линия 2-й половины, д. 24, оф. 35</h5>
+        <p class="card-text fw-bold"><a href="tel:+78002222222">8-800-222-22-22</a></p>
+        <p class="card-text fw-bold"><a href="mailto:info@flowerworld.ru">info@flowerworld.ru</a></p>
+
+    </div>
+</div>
+
+
+
+{% endblock %}
