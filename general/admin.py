@@ -1,3 +1,4 @@
-from django.contrib import admin
+from django.contrib.admin import AdminSite
 
-# Register your models here.
+# https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.AdminSite.site_header
+AdminSite.site_header = "Мир цветов"
