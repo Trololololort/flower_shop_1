@@ -27,7 +27,7 @@
             </a>
 
             {% if user.is_authenticated %}
-                {% include 'carts/parts/add_to_cart_form.html' with product_id=object.id %}
+                {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.id %}
             {% endif %}
           </div>
         </div>

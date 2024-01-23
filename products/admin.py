@@ -1,10 +1,6 @@
 from django.contrib import admin
 
-from products.models import Country, Category, Color, Product
-
-admin.site.register(Country)
-admin.site.register(Category)
-admin.site.register(Color)
+from products.models import Product
 
 
 class ProductAdmin(admin.ModelAdmin):

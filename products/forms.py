@@ -1,7 +1,8 @@
 from django import forms
 
 from products.const import SORT_CHOICES
-from products.models import Category, Product
+from products.models import Product
+from product_properties.models import Category
 
 
 def get_choices():

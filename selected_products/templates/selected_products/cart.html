@@ -30,11 +30,11 @@
             <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
             <td class="text-center">{{ object.product.price }}</td>
             <td class="text-end">
-            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+            {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
             </td>
 
             <td class="text-start">
-            {% include 'carts/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+            {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
             </td>
 
             <td class="text-center">{{ object.quantity }}</td>

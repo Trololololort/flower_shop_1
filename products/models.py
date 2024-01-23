@@ -8,26 +8,6 @@ from django.urls import reverse
 from general.model_mixins import NameMixin
 
 
-class Country(NameMixin,
-              models.Model):
-    class Meta:
-        verbose_name = "Страна"
-        verbose_name_plural = "Страны"
-
-
-class Category(NameMixin,
-               models.Model):
-    class Meta:
-        verbose_name = "Категория/Вид товара"
-        verbose_name_plural = "Категории/Виды товаров"
-
-
-class Color(NameMixin,
-            models.Model):
-    class Meta:
-        verbose_name = "Цвет"
-        verbose_name_plural = "Цвета"
-
 class ProductManager(models.Manager):
     def get_queryset(self):
         # В наличии и упорядоченные по убыванию даты добавления товара.
@@ -49,19 +29,19 @@ class Product(NameMixin,
                                 verbose_name="Цена",
                                 validators=[MinValueValidator(Decimal('0.01'))])
     origin = models.ForeignKey(
-        "Country",
+        "product_properties.Country",
         on_delete=models.CASCADE,
         verbose_name="Страна-производитель",
     )
 
     color = models.ForeignKey(
-        "Color",
+        "product_properties.Color",
         on_delete=models.CASCADE,
         verbose_name="Цвет",
     )
 
     category = models.ForeignKey(
-        "Category",
+        "product_properties.Category",
         on_delete=models.CASCADE,
         verbose_name="Категория / Вид товара",
     )
