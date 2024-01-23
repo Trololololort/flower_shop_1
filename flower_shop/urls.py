@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
-from orders.views import CreateOrder, OrdersListView, OrderDetailView
+from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
 from products.views import ProductDetailView, ProductListView
 
 urlpatterns = [
@@ -34,6 +34,7 @@ urlpatterns = [
     path("cart/", CartDetailView.as_view(), name="cart-detail"),
     path("orders/create/", CreateOrder.as_view(), name="create-order"),
     path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
+    path("orders/delete/", DeleteOrder.as_view(), name="delete-order"),
     path("orders/", OrdersListView.as_view(), name="orders-list"),
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

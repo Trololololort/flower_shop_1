@@ -17,3 +17,11 @@ def create_order(user):
     carts.update(order=new_order)
 
     return new_order.pk
+
+def delete_order(order_id):
+    # Не обрабатываем DoesNotExist,
+    # позволяем исключению всплыть в вызывающий метод.
+    order_obj = Order.objects.get(pk=order_id)
+    order_obj.delete()
+
+

@@ -12,16 +12,18 @@
             <th scope="col">Заказ</th>
             <th scope="col">Время заказа</th>
             <th scope="col">Статус</th>
+            <th scope="col">Удалить</th>
         </tr>
         </thead>
         <tbody>
 
-        {% for obj in object_list %}
+        {% for object in object_list %}
         <tr>
             <td>{{ forloop.counter }}</td>
             <td><a href="{{ obj.get_absolute_url }}">{{ obj.pk}} </a></td>
-            <td>{{ obj.ordered }}</td>
-            <td>{{ obj.get_status_display }}</td>
+            <td>{{ object.ordered }}</td>
+            <td>{{ object.get_status_display }}</td>
+            <td>{% if object.status == 'NEW' %}{% include 'orders/delete_order_form.html' with order=object %}{% endif %}
         </tr>
         {% endfor %}
         </tbody>

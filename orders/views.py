@@ -1,12 +1,13 @@
 from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Model
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
 
 from general.services import get_total
 from orders.models import Order
-from orders.service import create_order
+from orders.service import create_order, delete_order
 
 
 class CreateOrder(LoginRequiredMixin,
@@ -47,3 +48,17 @@ class OrderDetailView(LoginRequiredMixin,
         context["object_list"] = self.object.selectedproduct_set.all()
         context["total"] = get_total(context["object_list"])
         return context
+
+
+class DeleteOrder(LoginRequiredMixin,
+                  View):
+
+    def post(self, request):
+        order_id = request.POST.get("order")
+
+        try:
+            delete_order(order_id)
+            messages.add_message(request, messages.INFO, "Удален заказ {}.".format(order_id))
+        except Model.DoesNotExist :
+            messages.add_message(request, messages.ERROR, "Не удалось удалить заказ {}.".format(order_id))
+        return redirect("orders-list")

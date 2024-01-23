@@ -1,0 +1,10 @@
+{% comment %}
+{% include 'orders/delete_order_form.html' with order=order %}
+{% endcomment %}
+
+
+<form method="post" action="{% url 'delete-order' %}">
+    {% csrf_token %}
+    <input type="hidden" name="order" value="{{ order.id }}" >
+    <button type="submit" class="btn btn-danger">Удалить заказ</button>
+</form>
