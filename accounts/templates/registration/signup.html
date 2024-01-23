@@ -11,3 +11,88 @@
     </form>
 </div>
 {% endblock %}
+
+{% block script %}
+<script>
+    let $signUpForm = $("#sign-up-form");
+    let $signUpButton = $("#sign-up-button");
+
+    function clearErrorMessages(){
+      $(".error").remove();
+    }
+
+    function isPasswordRepeated(){
+      let $password = $("#id_password").val();
+      let $repeatedPassword = $("#id_repeated_password").val();
+
+      let result = true;
+
+      if ($password != $repeatedPassword) {
+        return false;
+      }
+
+      return result;
+    }
+
+    function showPasswordRepeatedErrorMessage(){
+      let $repeatedPassword = $("#id_repeated_password");
+      $("<p style='color: red;' class='error'>Повтор пароля не совпадает с паролем.</p>").insertBefore($repeatedPassword);
+    }
+
+    function showLoginOccupiedErrorMessage(){
+        let $login = $("#id_login");
+        $("<p style='color: red;' class='error'>Логин занят.</p>").insertBefore($login);
+    }
+
+
+    function isLoginOccupied(){
+       $.ajax({
+            type: "POST",
+            url: "{% url 'is-login-occupied' %}",
+            data: $signUpForm.serialize(),
+            success: signUp,
+            error: showLoginOccupiedErrorMessage,
+      });
+    }
+
+    function showLoginErrorMessage(){
+      let $login = $("id_login");
+      $("<p style='color: red;' class='error'>Логин занят.</p>").insertBefore($login);
+    }
+
+    function validateFormAndShowErrorMessages(){
+        let formValid = $signUpForm[0].reportValidity()
+
+        if (!formValid) {
+            return false;
+        }
+
+        let passwordRepeated = isPasswordRepeated();
+
+        if (!passwordRepeated) {
+          showPasswordRepeatedErrorMessage();
+
+          return false;
+        }
+
+        isLoginOccupied();
+
+    }
+
+    function signUp(){
+        $signUpForm.submit();
+    }
+
+    function addEventListeners(){
+        $signUpButton.on( "click", function( event ) {
+            event.preventDefault();
+            clearErrorMessages();
+            validateFormAndShowErrorMessages();
+        });
+    }
+
+    $( document ).ready(function() {
+      addEventListeners();
+    });
+</script>
+{% endblock %}
