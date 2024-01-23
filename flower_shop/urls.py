@@ -28,7 +28,7 @@ from products.views import ProductDetailView, ProductListView
 urlpatterns = [
     path("", ProductListView.as_view(), name="home"),
     path('admin/', admin.site.urls),
-    path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('product-list'), permanent=False)),
+    path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('home'), permanent=False)),
     path("accounts/", include("django.contrib.auth.urls")),
     path('contacts/', ContactsView.as_view(), name="contacts"),
     path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
