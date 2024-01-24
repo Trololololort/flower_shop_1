@@ -19,29 +19,40 @@ class ExtendedLoginView(LoginView):
     из пакета from django.contrib.auth.views.
     """
 
+    # LoginView - это наследник FormView.
+    # Поэтому нужна форма.
+    # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-editing/#formview
     form_class = LoginForm
-    template_name = "accounts/login.html"
+    template_name = "accounts/login.html"  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/mixins-simple/#django.views.generic.base.TemplateResponseMixin.template_name
 
 
-class SignUpView(View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
-                        # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+class SignUpView(View):  # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+    # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+
+    """
+    В Django нет готовой вьюшки для регистрации нового
+    пользователя. Создадим ее.
+
+    Воспользуемся для этого самым базовым классом - View.
+    Причина: нам нужно обработать и метод get (где
+    мы покажем пустую форму), и метод post,
+    куда форма направит данные.
+    """
+
     def get(self, request):
-        form = SignUpFormRegistrationForm()
+        form = SignUpFormRegistrationForm()  # Создадим экземпляр нашей формы для передачи его в контекст шаблона.
         return render(request, "registration/signup.html", {'form': form})
 
-    def post(self, request): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
+    def post(self,
+             request):  # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
         """
         Создать пользователя. После создания редирект на главную страницу.
         """
+
         # https://docs.djangoproject.com/en/5.0/ref/forms/api/#django.forms.Form
         # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpRequest.POST
         # Т.е. request.POST - это QueryDict. Таким образом,
         # мы правомерно сохранили форму, передав в нее request.POST.
-
-        # У UserCreationForm дедушка - ModelForm.
-        # Метод save этого класса создает объект класса содержащейся в форме модели и сохраняет его.
-        # https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/#the-save-method
-
         form = UserCreationForm(request.POST)
         if form.is_valid():
             # Теоретически, форма может быть невалидна.
@@ -55,20 +66,27 @@ class SignUpView(View): # https://docs.djangoproject.com/en/5.0/topics/class-bas
 
             # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/#using-messages-in-views-and-templates
             messages.add_message(request, messages.INFO, "Пользователь создан".format())
+
+            # У UserCreationForm дедушка - ModelForm.
+            # Метод save этого класса создает объект класса содержащейся в форме модели и сохраняет его.
+            # https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/#the-save-method
             form.save()
 
         return redirect("home")
 
 
-class IsLoginFreeView(View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
-                             # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
-    def post(self, request): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
+class IsLoginFreeView(
+    View):  # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+    # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+    def post(self,
+             request):  # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
         """
         Поверка занятости логина без перезагрузки страницы.
         В случае успеха вернуть
         """
-        login = request.POST.get("login") # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpRequest.POST
-                                          # Это объект класса QueryDict. Он похож на словарь и имеет метод get.
+        login = request.POST.get(
+            "login")  # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpRequest.POST
+        # Это объект класса QueryDict. Он похож на словарь и имеет метод get.
 
         status = get_status_and_message_whether_login_is_free(login)
 

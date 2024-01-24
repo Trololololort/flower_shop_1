@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.forms import ModelForm
 
-from accounts.const import FIELD_NAME_MAPPING, SignUpErrorMessages, ValidationPatterns
+from accounts.const import FIELD_NAME_MAPPING
+from accounts.models import CustomUser
 
 
 class LoginForm(AuthenticationForm):
@@ -46,25 +48,56 @@ class LoginForm(AuthenticationForm):
         return super().add_prefix(field_name)
 
 
-class SignUpFormRegistrationForm(forms.Form):
-    """
-    Форма будет проверяться на стороне клиента.
-    На стороне сервера - не будет для экономии времени
-    в учебной задаче.
-    """
+# class SignUpFormRegistrationForm(forms.Form):
+#     """
+#     Форма будет проверяться на стороне клиента.
+#     На стороне сервера - не будет для экономии времени
+#     в учебной задаче.
+#     """
+#
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#django.forms.TextInput
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#charfield
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#module-django.forms.widgets
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#passwordinput
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/widgets/#django.forms.Widget.attrs
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#label
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#emailfield
+#     # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#booleanfield
+#
+#     surname = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
+#                               label="Фамилия ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
+#     name = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
+#                            label="Имя ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
+#     partonymic = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
+#                                  label="Отчество ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
+#     login = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_LAT.value, ),
+#                             label="Логин ({})".format(SignUpErrorMessages.LAT_MESSAGE.value))
+#     password = forms.CharField(required=True,
+#                                widget=forms.PasswordInput(attrs=ValidationPatterns.VALIDATE_GTE6.value, ),
+#                                label="Пароль ({})".format(SignUpErrorMessages.GTE6_MESSAGE.value))
+#     repeated_password = forms.CharField(widget=forms.PasswordInput(attrs=ValidationPatterns.VALIDATE_GTE6.value, ),
+#                                         label="Повтор пароля")
+#     email = forms.EmailField(required=True, label="Электронная почта")
+#     rules = forms.BooleanField(required=True, label="Согласен с правилами регистрации")
 
-    surname = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
-                              label="Фамилия ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
-    name = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
-                           label="Имя ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
-    partonymic = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_CYR.value, ),
-                                 label="Отчество ({})".format(SignUpErrorMessages.CYR_MESSAGE.value))
-    login = forms.CharField(required=True, widget=forms.TextInput(attrs=ValidationPatterns.VALIDATE_LAT.value, ),
-                            label="Логин ({})".format(SignUpErrorMessages.LAT_MESSAGE.value))
-    password = forms.CharField(required=True,
-                               widget=forms.PasswordInput(attrs=ValidationPatterns.VALIDATE_GTE6.value, ),
-                               label="Пароль ({})".format(SignUpErrorMessages.GTE6_MESSAGE.value))
-    repeated_password = forms.CharField(widget=forms.PasswordInput(attrs=ValidationPatterns.VALIDATE_GTE6.value, ),
-                                        label="Повтор пароля")
-    email = forms.EmailField(required=True, label="Электронная почта")
-    rules = forms.BooleanField(required=True, label="Согласен с правилами регистрации")
+
+class SignUpFormRegistrationForm(ModelForm):
+    class Meta:
+        model = CustomUser
+        exclude = ["last_login",
+                   "groups",
+                   "user_permissions",
+                   "is_staff",
+                   "is_superuser",
+                   "is_active",
+                   "date_joined",
+                   ]
+
+    def add_prefix(self, field_name):
+        # Если поле в FIELD_NAME_MAPPING, подменить - взять из FIELD_NAME_MAPPING.
+
+        # https://docs.python.org/3.12/library/stdtypes.html#dict.get
+        # Обратите внимание: здесь field_name, field_name. Второе упоминание field_name -
+        # это значение по умолчанию.
+        field_name = FIELD_NAME_MAPPING.get(field_name, field_name)
+        return super().add_prefix(field_name)
