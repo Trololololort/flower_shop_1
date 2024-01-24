@@ -1,17 +1,26 @@
 from django.contrib.auth.models import User
+from enum import Enum
 
 
-def is_login_occupied(login):
+class HttpStatusCodes(Enum):
+    OK = 204
+    CONFLICT = 409
+
+
+def get_status_and_message_whether_login_is_free(login):
     """
-    Организация проверки логина без перезагрузки страницы.
     В зависимости от того, занят ли логин,
-    отправить 204 или 409.
-    """
-    status = {"status": 204, "message": "Login is free"}
+    подготовить коды ответа на запрос к серверу.
 
-    occupied_login = User.objects.filter(username=login).first()
+    Ответ: 1) 204 -  логин свободен.
+           2) 409 - логин занят.
+    """
+    status = {"status": HttpStatusCodes.OK.value, "message": "Login is free"}
+
+    # https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-specific-objects-with-filters
+    occupied_login = bool(User.objects.filter(username=login).first())
 
     if occupied_login:
-        status = {"status": 409, "message": "Login is occupied"}
+        status = {"status": HttpStatusCodes.CONFLICT.value, "message": "Login is occupied"}
 
     return status

@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 
-from accounts.views import SignUpView, IsLoginOccupiedView
+from accounts.views import SignUpView, IsLoginFreeView
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
@@ -43,7 +43,7 @@ urlpatterns = [
       path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
       path("orders/delete/", DeleteOrder.as_view(), name="delete-order"),
       path("orders/", OrdersListView.as_view(), name="orders-list"),
-      path("is-login-occupied/", IsLoginOccupiedView.as_view(), name="is-login-occupied"),
+      path("is-login-occupied/", IsLoginFreeView.as_view(), name="is-login-occupied"),
 
   ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
                                                                                            document_root=settings.MEDIA_ROOT)
