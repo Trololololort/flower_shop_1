@@ -1,13 +1,27 @@
 {% extends 'general/base.html' %}
 
+
+{% comment %}
+
+Применяется form.as_p, потому что на мобильных устройствах в данном случае
+такое отображение выглядит лучше. На десктопах красивее
+<table>
+    {{ form.as_table }}
+</table>
+
+На красивую верстку этой формы времени нет. Такая верстка, может быть,
+не понравится эксперту. Но это меньшее из зол.
+
+Останется время, переверстаете на форму из Bootstrap. А если времени не останется, то
+и вариантов нет других, кроме как as_p или as_table.
+
+{% endcomment %}
+
 {% block content %}
 <div class="form-signin w-100 m-auto">
     <form method="post">
         {% csrf_token %}
-
-        <table>
-            {{ form.as_table }}
-        </table>
+        {{ form.as_p }}
 
         <button class="btn btn-primary py-2" type="submit">Зарегистрироваться</button>
     </form>

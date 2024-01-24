@@ -18,7 +18,7 @@ class ProductListView(ListView):
         order_by = self.request.GET.get("order_by")
 
         if order_by:
-            if order_by == 'price' or order_by == 'added':
+            if order_by == 'price' or order_by == 'added_at':
                 # По убыванию цены и даты добавления.
                 queryset = queryset.order_by("-" + order_by)
 
