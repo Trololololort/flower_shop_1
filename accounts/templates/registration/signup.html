@@ -5,7 +5,9 @@
     <form method="post">
         {% csrf_token %}
 
-        {{ form.as_p }}
+        <table>
+            {{ form.as_table }}
+        </table>
 
         <button class="btn btn-primary py-2" type="submit">Зарегистрироваться</button>
     </form>
@@ -48,7 +50,7 @@
     function isLoginOccupied(){
        $.ajax({
             type: "POST",
-            url: "{% url 'is-login-occupied' %}",
+            url: "{% url 'is-login-free' %}",
             data: $signUpForm.serialize(),
             success: signUp,
             error: showLoginOccupiedErrorMessage,

@@ -35,7 +35,7 @@ class OrdersListView(LoginRequiredMixin,
 
     def get_queryset(self):
         result = Order.objects.filter(user=self.request.user).order_by(
-            "-ordered")
+            "-ordered_at")
         return result
 
 

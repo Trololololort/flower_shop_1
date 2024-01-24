@@ -1,6 +1,5 @@
 from _decimal import Decimal
 
-
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -11,7 +10,7 @@ from general.model_mixins import NameMixin
 class ProductManager(models.Manager):
     def get_queryset(self):
         # В наличии и упорядоченные по убыванию даты добавления товара.
-        return super().get_queryset().filter(stock__gte=1).order_by("-added")
+        return super().get_queryset().filter(stock__gte=1).order_by("-added_at")
 
 
 class Product(NameMixin,
@@ -19,9 +18,8 @@ class Product(NameMixin,
     objects = models.Manager()  # По умолчанию. Нужен для админки.
     in_stock = ProductManager()
 
-    added = models.DateTimeField(auto_now_add=True,
-                                 verbose_name="Дата добавления")
-
+    added_at = models.DateTimeField(auto_now_add=True,
+                                    verbose_name="Дата добавления")
 
     photo = models.ImageField(verbose_name="Фото. Рекомендовано 500 x 500 px", blank=False)
     price = models.DecimalField(max_digits=10,

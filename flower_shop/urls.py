@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 
-from accounts.views import SignUpView, IsLoginFreeView
+from accounts.views import SignUpView, IsLoginFreeView, ExtendedLoginView
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
@@ -30,20 +30,28 @@ urlpatterns = [
       path("", ProductListView.as_view(), name="home"),
       path('admin/', admin.site.urls),
 
+      path("accounts/login/", ExtendedLoginView.as_view(), name="login"),
+      path("accounts/is-login-occupied/", IsLoginFreeView.as_view(), name="is-login-free"),
       path("accounts/signup/", SignUpView.as_view(), name="signup"),
       path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('home'), permanent=False)),
       path("accounts/", include("django.contrib.auth.urls")),
+
       path('contacts/', ContactsView.as_view(), name="contacts"),
+
       path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
       path("products/", ProductListView.as_view(), name="product-list"),
+
       path("about/", AboutCompanyView.as_view(), name="about"),
+
       path("cart/add/", AddToCart.as_view(), name="add-to-cart"),
       path("cart/", CartDetailView.as_view(), name="cart-detail"),
+
       path("orders/create/", CreateOrder.as_view(), name="create-order"),
       path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
       path("orders/delete/", DeleteOrder.as_view(), name="delete-order"),
       path("orders/", OrdersListView.as_view(), name="orders-list"),
-      path("is-login-occupied/", IsLoginFreeView.as_view(), name="is-login-occupied"),
+
+
 
   ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
                                                                                            document_root=settings.MEDIA_ROOT)

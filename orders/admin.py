@@ -7,7 +7,7 @@ from .models import Order
 
 class OrderAdmin(admin.ModelAdmin):
     exclude = []
-    list_display = ["id", "ordered", "status", ]
+    list_display = ["id", "ordered_at", "status", ]
 
 
 admin.site.register(Order, OrderAdmin)

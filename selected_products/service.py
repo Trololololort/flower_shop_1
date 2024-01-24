@@ -26,9 +26,9 @@ def add_product_to_cart(product_id, user, addend):
             the_product_already_in_cart.quantity = (the_product_already_in_cart.quantity + addend)
 
             if the_product_already_in_cart.quantity == 0:
-                the_product_already_in_cart.delete()
+                the_product_already_in_cart.delete() # https://docs.djangoproject.com/en/5.0/topics/db/queries/#deleting-objects
             else:
-                the_product_already_in_cart.save()
+                the_product_already_in_cart.save() # https://docs.djangoproject.com/en/5.0/ref/models/instances/#saving-objects
 
         else:
             SelectedProduct.objects.create(user=user, product=product, quantity=1)

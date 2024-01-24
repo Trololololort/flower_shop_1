@@ -9,9 +9,8 @@ from orders.const import ORDER_STATUS
 
 class Order(UserMixin,
             models.Model):
-
-    ordered = models.DateTimeField(auto_now_add=True,
-                                   verbose_name="Дата заказа")
+    ordered_at = models.DateTimeField(auto_now_add=True,
+                                      verbose_name="Дата заказа")
     status = models.CharField(max_length=9,
                               choices=ORDER_STATUS,
                               verbose_name="Статус",
@@ -26,6 +25,7 @@ class Order(UserMixin,
 
     def get_absolute_url(self):
         return reverse('order-detail', kwargs={"pk": self.id})
+
     def __str__(self):
         return "{}".format(self.id)
 

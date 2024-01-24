@@ -21,7 +21,7 @@
         <tr>
             <td>{{ forloop.counter }}</td>
             <td><a href="{{ object.get_absolute_url }}">{{ object.pk}} </a></td>
-            <td>{{ object.ordered }}</td>
+            <td>{{ object.ordered_at }}</td>
             <td>{{ object.get_status_display }}</td>
             <td>{% if object.status == 'NEW' %}{% include 'orders/delete_order_form.html' with order=object %}{% endif %}
         </tr>
