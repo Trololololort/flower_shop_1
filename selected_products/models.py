@@ -7,11 +7,11 @@ class SelectedProduct(UserMixin,
                       models.Model):
     """
     Корзины как сущности нет.
-    Но есть корзина виртуальная.
     Пользователь отобрал товар.
     Пока поле order пустое, товар в корзине.
     Когда поле order непустое, это уже
     совершенный заказ.
+    Т.е. корзина виртуальная.
     """
 
     product = models.ForeignKey("products.Product",
@@ -26,9 +26,9 @@ class SelectedProduct(UserMixin,
                                            verbose_name="Количество")
 
     order = models.ForeignKey("orders.Order",
-                                 on_delete=models.CASCADE,
-                                 null=True,
-                                 blank=True, )
+                              on_delete=models.CASCADE,
+                              null=True,
+                              blank=True, )
 
     def price(self):
         return self.product.price
