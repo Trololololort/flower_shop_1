@@ -1,9 +1,9 @@
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.views import generic, View
+from django.views import View
 
 from accounts.forms import LoginForm, SignUpFormRegistrationForm
 from accounts.service import get_status_and_message_whether_login_is_free
@@ -14,19 +14,22 @@ class ExtendedLoginView(LoginView):
     Вместо стандартной формы Django
     используем собственную форму,
     чтобы соблюсти требования ТЗ.
+
+    Поэтому наследуем от LoginView
+    из пакета from django.contrib.auth.views.
     """
 
     form_class = LoginForm
     template_name = "accounts/login.html"
 
 
-class SignUpView(generic.View):
-
+class SignUpView(View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+                        # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
     def get(self, request):
         form = SignUpFormRegistrationForm()
         return render(request, "registration/signup.html", {'form': form})
 
-    def post(self, request):
+    def post(self, request): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
         """
         Создать пользователя. После создания редирект на главную страницу.
         """
@@ -57,9 +60,9 @@ class SignUpView(generic.View):
         return redirect("home")
 
 
-class IsLoginFreeView(View):
-
-    def post(self, request):
+class IsLoginFreeView(View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+                             # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+    def post(self, request): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
         """
         Поверка занятости логина без перезагрузки страницы.
         В случае успеха вернуть

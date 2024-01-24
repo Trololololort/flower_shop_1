@@ -10,55 +10,71 @@ from orders.models import Order
 from orders.service import create_order, delete_order
 
 
-class CreateOrder(LoginRequiredMixin,
-                  View):
-    def post(self, request):
-        user = request.user
+class CreateOrder(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                  View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+                         # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+    def post(self, request): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
+        user = request.user # В запросе содержится пользователь. Проверить можно, остановившись на точке останова.
         password = request.POST.get("password")
 
-        password_correct_for_user = auth.authenticate(request, username=user.username, password=password)
+        # https://docs.djangoproject.com/en/5.0/topics/auth/default/#authenticating-users
+        password_correct_for_user = bool(auth.authenticate(request,
+                                                           username=user.username,
+                                                           password=password))
 
         if not password_correct_for_user:
-            messages.add_message(request, messages.ERROR, "Неверный пароль")
-            return redirect("cart-detail")
+            messages.add_message(request, messages.ERROR, "Неверный пароль") # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+            redirect_to_name = "cart-detail"
+        else:
+            new_order_id = create_order(user)
 
-        new_order_id = create_order(user)
+            # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+            messages.add_message(request, messages.INFO,
+                                 "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
+            redirect_to_name = "orders-list"
+        return redirect(redirect_to_name) # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
 
-        messages.add_message(request, messages.INFO, "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
 
-        return redirect("orders-list")
-
-
-class OrdersListView(LoginRequiredMixin,
-                     ListView):
+class OrdersListView(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                     ListView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#listview
     model = Order
 
-    def get_queryset(self):
+    def get_queryset(self): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/mixins-single-object/#django.views.generic.detail.SingleObjectMixin.get_queryset
         result = Order.objects.filter(user=self.request.user).order_by(
-            "-ordered_at")
+            "-ordered_at") # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#filter
+                           # https://docs.djangoproject.com/en/5.0/ref/models/querysets/#order-by
+
         return result
 
 
-class OrderDetailView(LoginRequiredMixin,
-                      DetailView):
+class OrderDetailView(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                      DetailView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#detailview
     model = Order
 
     def get_context_data(self, **kwargs):
+        # Удобно посмотреть, как переопределить данный метод, в документации
+        # к TemplateView.
+        # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
         context = super().get_context_data(**kwargs)
         context["object_list"] = self.object.selectedproduct_set.all()
         context["total"] = get_total(context["object_list"])
         return context
 
 
-class DeleteOrder(LoginRequiredMixin,
-                  View):
+class DeleteOrder(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                  View): # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#using-class-based-views
+                         # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
 
-    def post(self, request):
+    def post(self, request): # # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
         order_id = request.POST.get("order")
 
         try:
             delete_order(order_id)
+
+            # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             messages.add_message(request, messages.INFO, "Удален заказ {}.".format(order_id))
-        except Model.DoesNotExist :
+        except Model.DoesNotExist: # https://docs.djangoproject.com/en/5.0/ref/models/class/#doesnotexist
+
+            # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             messages.add_message(request, messages.ERROR, "Не удалось удалить заказ {}.".format(order_id))
-        return redirect("orders-list")
+        return redirect("orders-list") # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect

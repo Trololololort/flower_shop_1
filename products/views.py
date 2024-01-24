@@ -4,7 +4,7 @@ from products.forms import ProductSortFilterForm
 from products.models import Product
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(DetailView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#detailview
     model = Product
 
 

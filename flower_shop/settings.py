@@ -110,9 +110,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru-ru' # https://docs.djangoproject.com/en/5.0/ref/settings/#language-code
+                        # http://www.i18nguy.com/unicode/language-identifiers.html
 
-TIME_ZONE = 'Europe/Moscow'
+TIME_ZONE = 'Europe/Moscow' # https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-TIME_ZONE
+                            # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 USE_I18N = True
 
@@ -123,14 +125,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = 'media/' # https://docs.djangoproject.com/en/5.0/ref/settings/#media-url
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/' # https://docs.djangoproject.com/en/5.0/ref/settings/#logout-redirect-url
 
-AUTH_USER_MODEL = "accounts.CustomUser"
+AUTH_USER_MODEL = "accounts.CustomUser" # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-user-model

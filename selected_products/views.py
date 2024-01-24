@@ -11,8 +11,8 @@ from general.services import get_total
 from orders.forms import OrderForm
 
 
-class AddToCart(LoginRequiredMixin,
-                View):
+class AddToCart(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                View): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
     def post(self, request):
         """
         Добавить или убрать товар из корзины.
@@ -33,17 +33,21 @@ class AddToCart(LoginRequiredMixin,
         status = add_product_to_cart(product_id, request.user, addend)
 
         if status["status"] == 200:
-            messages.add_message(request, messages.INFO, status["message"])
-            return redirect(request.META['HTTP_REFERER'])
+            messages.add_message(request, messages.INFO, status["message"]) # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+
+            # В запросе всегда содержится адрес страницы, отправившей его.
+            # В корзину добавляться товар может с разных страниц.
+            # Вернем ответ адресату запроса.
+            return redirect(request.META['HTTP_REFERER']) # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
         else:
-            return HttpResponse(status["message"], status=status["status"])
+            return HttpResponse(status["message"], status=status["status"]) # https://docs.djangoproject.com/en/5.0/ref/request-response/#httpresponse-objects
 
 
-class CartDetailView(LoginRequiredMixin,
-                     TemplateView):
-    template_name = "selected_products/cart.html"
+class CartDetailView(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                     TemplateView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
+    template_name = "selected_products/cart.html" # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
         context = super().get_context_data(**kwargs)
         object_list = get_cart_contents(self.request.user)
         context["object_list"] = object_list
