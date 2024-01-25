@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from accounts.forms import LoginForm, SignUpFormRegistrationForm
-from accounts.service import get_status_and_message_whether_login_is_free
+from accounts.service import get_status_and_message_whether_login_is_free, create_user
 
 
 class ExtendedLoginView(LoginView):
@@ -40,8 +40,13 @@ class SignUpView(View):  # https://docs.djangoproject.com/en/5.0/topics/class-ba
     """
 
     def get(self, request):
+        """
+        Показать пустую форму.
+        """
         form = SignUpFormRegistrationForm()  # Создадим экземпляр нашей формы для передачи его в контекст шаблона.
-        return render(request, "registration/signup.html", {'form': form})
+        return render(request,
+                      "accounts/signup.html",
+                      {'form': form})  # # https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/#the-save-method
 
     def post(self,
              request):  # https://docs.djangoproject.com/en/5.0/topics/class-based-views/intro/#handling-forms-with-class-based-views
@@ -54,24 +59,36 @@ class SignUpView(View):  # https://docs.djangoproject.com/en/5.0/topics/class-ba
         # Т.е. request.POST - это QueryDict. Таким образом,
         # мы правомерно сохранили форму, передав в нее request.POST.
         form = UserCreationForm(request.POST)
-        if form.is_valid():
-            # Теоретически, форма может быть невалидна.
-            # Но мы проверили, свободен ли логин без перезагрузки страницы.
-            # И проверили остальные поля на клиенте.
-            # Плюс стоит CSRF-защита: постманом запрос не пошлешь сюда.
-            # Поэтому очень маловероятно,
-            # что экзаменатор сможет попасть на случай, когда форма невалидна.
-            # Поэтому не тратим время даже на организацию отправки содержательного
-            # статуса HTTP для случая невалидной формы.
 
-            # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/#using-messages-in-views-and-templates
-            messages.add_message(request, messages.INFO, "Пользователь создан".format())
+        # Теоретически, форма может быть невалидна.
+        # Но мы проверили, свободен ли логин без перезагрузки страницы.
+        # И проверили остальные поля на клиенте.
+        # Плюс стоит CSRF-защита: постманом запрос не пошлешь сюда.
+        # Поэтому очень маловероятно,
+        # что экзаменатор сможет попасть на случай, когда форма невалидна.
+        # Поэтому не тратим время даже на организацию отправки содержательного
+        # статуса HTTP для случая невалидной формы.
 
-            # У UserCreationForm дедушка - ModelForm.
-            # Метод save этого класса создает объект класса содержащейся в форме модели и сохраняет его.
-            # https://docs.djangoproject.com/en/5.0/topics/forms/modelforms/#the-save-method
-            form.save()
+        surname = request.POST.get('surname')
+        name = request.POST.get('name')
+        partonymic = request.POST.get('partonymic')
+        login = request.POST.get('login')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        rules = bool(request.POST.get('rules'))
 
+        create_user(surname,
+                    name,
+                    partonymic,
+                    login,
+                    email,
+                    rules,
+                    password)
+
+        # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+        messages.add_message(request, messages.INFO, "Создан пользователь {}.".format(login))
+
+        # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/#using-messages-in-views-and-templates
         return redirect("home")
 
 

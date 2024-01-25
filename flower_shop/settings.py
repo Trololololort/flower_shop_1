@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.urls import reverse
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -26,7 +27,6 @@ SECRET_KEY = 'django-insecure-h_ar#s80a4y3=wvh-gir!h#rr4**v8tn6z^ct04&3&5$r@iasv
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -76,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'flower_shop.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -86,7 +85,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -106,33 +104,47 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru' # https://docs.djangoproject.com/en/5.0/ref/settings/#language-code
-                        # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'ru-ru'  # https://docs.djangoproject.com/en/5.0/ref/settings/#language-code
+# http://www.i18nguy.com/unicode/language-identifiers.html
 
-TIME_ZONE = 'Europe/Moscow' # https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-TIME_ZONE
-                            # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+TIME_ZONE = 'Europe/Moscow'  # https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-TIME_ZONE
+# https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/' # https://docs.djangoproject.com/en/5.0/ref/settings/#media-url
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
+MEDIA_URL = 'media/'  # https://docs.djangoproject.com/en/5.0/ref/settings/#media-url
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = '/' # https://docs.djangoproject.com/en/5.0/ref/settings/#logout-redirect-url
+# По умолчанию переадресует на '/accounts/login/'.
+# У  нас нет такой страницы. Создавать ее смысла нет - слишком долго,
+# да и в задании ее не было. Поэтому просто переадресуем на главную.
 
-AUTH_USER_MODEL = "accounts.CustomUser" # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-user-model
+# settings.py загружается раньше всего остального проекта.
+# Т.е. раньше, чем загрузятся приложения и urlpattern.
+# Поэтому функция reverse не заработает.
+# Придется захардкодить путь.
+
+# https://docs.djangoproject.com/en/5.0/ref/settings/#login-redirect-url
+
+LOGIN_REDIRECT_URL = '/'
+
+# См. комментарий к LOGIN_REDIRECT_URL по поводу вынужденной
+# необходимости захардкодить url.
+# https://docs.djangoproject.com/en/5.0/ref/settings/#logout-redirect-url
+LOGOUT_REDIRECT_URL = '/about/'
+
+AUTH_USER_MODEL = "accounts.CustomUser"  # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-user-model

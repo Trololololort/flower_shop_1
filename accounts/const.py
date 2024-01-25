@@ -32,3 +32,8 @@ FIELD_NAME_MAPPING = {
     # 'last_name': 'surname',
     # 'first_name': 'name',
 }
+
+
+class HttpStatusCodes(Enum):
+    OK = 204
+    CONFLICT = 409

@@ -1,10 +1,7 @@
 from django.contrib.auth.models import User
-from enum import Enum
 
-
-class HttpStatusCodes(Enum):
-    OK = 204
-    CONFLICT = 409
+from accounts.const import HttpStatusCodes
+from accounts.models import CustomUser
 
 
 def get_status_and_message_whether_login_is_free(login):
@@ -24,3 +21,30 @@ def get_status_and_message_whether_login_is_free(login):
         status = {"status": HttpStatusCodes.CONFLICT.value, "message": "Login is occupied"}
 
     return status
+
+
+def create_user(surname,
+                name,
+                partonymic,
+                login,
+                email,
+                rules,
+                password):
+    user = CustomUser.objects.create(last_name=surname,
+                                     first_name=name,
+                                     partonymic=partonymic,
+                                     username=login,
+                                     password=password,
+                                     email=email,
+                                     rules=rules)
+
+    # Когда передали пароль в метод create,
+    # для нас это была, по сути, заглушка.
+    # Дело в том, что он сохранится в неизменном виде.
+    # А вся система аутентификации Django ориентируется
+    # На хеширование паролей. Иначе говоря,
+    # если оставить, как было, пользователь не сможет логиниться.
+    # Сохраним хэшированный пароль.
+    user.set_password(user.password)
+
+    user.save()

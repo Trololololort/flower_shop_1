@@ -1,43 +1,70 @@
 {% extends 'general/base.html' %}
+
+{% comment %}
+Заголовок страницы сделан на основе образца Pricing в Bootstrap.
+https://getbootstrap.com/docs/5.3/examples/pricing/
+
+Слайдер добавлен копированием из документации Bootstrap:
+https://getbootstrap.com/docs/5.3/components/carousel/
+
+
+https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#static
+https://docs.djangoproject.com/en/5.0/ref/templates/builtins/#for
+
+Изображение (ImageField) является дочерник классом от FileField.
+А у последнего есть атрибут url.
+
+Цитата:
+
+"
+You’ll most likely want to use the convenience url attribute provided by Django. For example, if your ImageField is called mug_shot, you can get the absolute path to your image in a template with {{ object.mug_shot.url }}.
+"
+
+https://docs.djangoproject.com/en/5.0/ref/models/fields/#filefield
+{% endcomment %}
+
+
 {% load static %}
 
 {% block headline %}
 <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-  <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
-  <h2 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h2>
+    <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
+    <h2 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h2>
 
-  <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
+    <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
 </div>
 {% endblock %}
 
 {% block content %}
 <div id="carouselExampleCaptions" class="carousel carousel-dark slide" data-bs-ride="carousel">
 
-  <div class="carousel-indicators">
-    {% for object in object_list %}
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
-    {% endfor %}
-  </div>
-  <div class="carousel-inner">
-    {% for object in object_list %}
-    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-      <img src="{{ object.photo.url }}" class="d-block w-100" alt="{{ object.name }}">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>{{ object.name }}</h5>
-        <p>В продаже с {{ object.added }}</p>
-      </div>
+    <div class="carousel-indicators">
+        {% for object in object_list %}
+        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" {% if
+                forloop.first %}class="active" aria-current="true" {% endif %}
+                aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
     </div>
-    {% endfor %}
-  </div>
+    <div class="carousel-inner">
+        {% for object in object_list %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ object.photo.url }}" class="d-block w-100" alt="{{ object.name }}">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>{{ object.name }}</h5>
+                <p>В продаже с {{ object.added_at }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>
 {% endblock %}
 
