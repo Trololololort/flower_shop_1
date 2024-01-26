@@ -31,7 +31,7 @@ urlpatterns = [
       path('admin/', admin.site.urls),
 
       path("accounts/login/", ExtendedLoginView.as_view(), name="login"),
-      path("accounts/is-login-occupied/", IsLoginFreeView.as_view(), name="is-login-free"),
+      path("accounts/is-login-free/", IsLoginFreeView.as_view(), name="is-login-free"),
       path("accounts/signup/", SignUpView.as_view(), name="signup"),
       path("accounts/profile/", RedirectView.as_view(url=reverse_lazy('home'), permanent=False)),
       path("accounts/", include("django.contrib.auth.urls")),

@@ -40,8 +40,7 @@ https://docs.djangoproject.com/en/5.0/ref/models/fields/#filefield
 
     <div class="carousel-indicators">
         {% for object in object_list %}
-        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" {% if
-                forloop.first %}class="active" aria-current="true" {% endif %}
+        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %} class="active" aria-current="true" {% endif %}
                 aria-label="Slide {{ forloop.counter }}"></button>
         {% endfor %}
     </div>

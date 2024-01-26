@@ -101,11 +101,12 @@ class IsLoginFreeView(
         Поверка занятости логина без перезагрузки страницы.
         В случае успеха вернуть
         """
-        login = request.POST.get(
-            "login")  # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpRequest.POST
-        # Это объект класса QueryDict. Он похож на словарь и имеет метод get.
 
-        status = get_status_and_message_whether_login_is_free(login)
+        # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpRequest.POST
+        # request.POST - это объект типа QueryDict. Он похож на словарь и имеет метод get.
+        login = request.POST.get("login")  #
+
+        status_code = get_status_and_message_whether_login_is_free(login)
 
         # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpResponse
-        return HttpResponse(status["status"], message=status["message"])
+        return HttpResponse(status_code)

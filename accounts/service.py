@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 
 from accounts.const import HttpStatusCodes
 from accounts.models import CustomUser
@@ -9,19 +9,27 @@ def get_status_and_message_whether_login_is_free(login):
     В зависимости от того, занят ли логин,
     подготовить коды ответа на запрос к серверу.
 
-    Ответ: 1) 204 -  логин свободен.
+    Ответ: 1) 200 -  логин свободен.
            2) 409 - логин занят.
     """
-    status = {"status": HttpStatusCodes.OK.value, "message": "Login is free"}
 
     # https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-specific-objects-with-filters
-    occupied_login = bool(User.objects.filter(username=login).first())
+    login_is_occupied = bool(CustomUser.objects.filter(username=login).first())
 
-    if occupied_login:
-        status = {"status": HttpStatusCodes.CONFLICT.value, "message": "Login is occupied"}
+    if not login_is_occupied:
+        status_code = HttpStatusCodes.OK.value
+    else:
+        status_code = HttpStatusCodes.CONFLICT.value
 
-    return status
+    return status_code
 
+    # Если в метод create передать пароль, как есть,
+    # он сохранится в открытом виде.
+    # А вся система аутентификации Django ориентируется
+    # на хеширование паролей. Иначе говоря,
+    # если оставить, как было, пользователь не сможет логиниться.
+    # Поэтому сохраним хэшированный пароль,
+    # воспользовавшись готовой функцией make_password.
 
 def create_user(surname,
                 name,
@@ -34,17 +42,11 @@ def create_user(surname,
                                      first_name=name,
                                      partonymic=partonymic,
                                      username=login,
-                                     password=password,
+                                     password=make_password(password), # Функция из модуля django.contrib.auth.hashers
                                      email=email,
                                      rules=rules)
 
-    # Когда передали пароль в метод create,
-    # для нас это была, по сути, заглушка.
-    # Дело в том, что он сохранится в неизменном виде.
-    # А вся система аутентификации Django ориентируется
-    # На хеширование паролей. Иначе говоря,
-    # если оставить, как было, пользователь не сможет логиниться.
-    # Сохраним хэшированный пароль.
-    user.set_password(user.password)
+
+
 
     user.save()

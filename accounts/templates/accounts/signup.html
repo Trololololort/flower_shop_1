@@ -20,11 +20,11 @@
 
 {% block content %}
 <div class="form-signin w-100 m-auto">
-    <form method="post">
+    <form id="sign-up-form" method="post">
         {% csrf_token %}
         {{ form.as_p }}
 
-        <button class="btn btn-primary py-2" type="submit">Зарегистрироваться</button>
+        <button id="sign-up-button" class="btn btn-primary py-2" type="submit">Зарегистрироваться</button>
     </form>
 </div>
 {% endblock %}
@@ -42,18 +42,12 @@
       let $password = $("#id_password").val();
       let $repeatedPassword = $("#id_repeated_password").val();
 
-      let result = true;
-
-      if ($password != $repeatedPassword) {
-        return false;
-      }
-
-      return result;
+      return $password == $repeatedPassword;
     }
 
     function showPasswordRepeatedErrorMessage(){
       let $repeatedPassword = $("#id_repeated_password");
-      $("<p style='color: red;' class='error'>Повтор пароля не совпадает с паролем.</p>").insertBefore($repeatedPassword);
+      $("<p class='error'>Повтор пароля не совпадает с паролем.</p>").insertBefore($repeatedPassword);
     }
 
     function showLoginOccupiedErrorMessage(){
@@ -73,12 +67,12 @@
     }
 
     function showLoginErrorMessage(){
-      let $login = $("id_login");
-      $("<p style='color: red;' class='error'>Логин занят.</p>").insertBefore($login);
+        let $login = $("id_login");
+        $("<p class='error'>Логин занят.</p>").insertBefore($login);
     }
 
     function validateFormAndShowErrorMessages(){
-        let formValid = $signUpForm[0].reportValidity()
+        let formValid = $signUpForm[0].reportValidity(); // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reportValidity
 
         if (!formValid) {
             return false;

@@ -14,3 +14,7 @@ a {
     color: purple !important;
     text-decoration: none !important;
 }
+
+.error {
+    color: var(--bs-danger);
+}
