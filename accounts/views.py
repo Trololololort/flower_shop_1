@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-
+from django.urls import reverse
 from accounts.forms import LoginForm, SignUpFormRegistrationForm
 from accounts.service import get_status_and_message_whether_login_is_free, create_user
 
@@ -89,7 +89,20 @@ class SignUpView(View):  # https://docs.djangoproject.com/en/5.0/topics/class-ba
         messages.add_message(request, messages.INFO, "Создан пользователь {}.".format(login))
 
         # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/#using-messages-in-views-and-templates
-        return redirect("home")
+        # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
+        # Если зайти в виртуальное окружение и посмотреть файл urls.py (Путь должен быть примерно такой: /venv/lib/python3.10/site-packages/django/contrib/auth/urls.py),
+        # то увидим:
+        # urlpatterns = [
+        #     path("login/", views.LoginView.as_view(), name="login"),
+        # Поэтому пишем, что редирект на имя "login".
+        # Если вдруг на экзамене будет трудно, напишите "home".
+        # Этот путь и имя длля него задавали мы,
+        # может быть, так будет проще. Или еще проще:
+        # return redirect("/")
+        # ТЗ об этом умалчивает, поэтому
+        # балл снижен не будет. Но логично после регистрации переправить
+        # на страницу логина.
+        return redirect("login")
 
 
 class IsLoginFreeView(

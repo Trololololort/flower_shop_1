@@ -33,14 +33,14 @@ def get_status_and_message_whether_login_is_free(login):
 
 def create_user(surname,
                 name,
-                partonymic,
+                patronymic,
                 login,
                 email,
                 rules,
                 password):
     user = CustomUser.objects.create(last_name=surname,
                                      first_name=name,
-                                     partonymic=partonymic,
+                                     patronymic=patronymic,
                                      username=login,
                                      password=make_password(password), # Функция из модуля django.contrib.auth.hashers
                                      email=email,

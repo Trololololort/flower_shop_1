@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models import Sum
 from django.urls import reverse
 
 from general.model_mixins import UserMixin
@@ -22,6 +23,19 @@ class Order(UserMixin,
                                           default="",
                                           null=False,
                                           blank=True)
+
+    def ordered_by(self):
+        # Для админки: по ТЗ в списке видно ФИО заказчика.
+        return self.user.full_name
+
+    ordered_by.short_description = 'ФИО заказчика' # https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#the-display-decorator
+
+    def number_of_ordered_products(self):
+        # Для админки: по ТЗ в списке видно количество заказанных товаров.
+        # https://docs.djangoproject.com/en/5.0/topics/db/aggregation/#aggregating-on-empty-querysets-or-groups
+        return self.selectedproduct_set.aggregate(number_of_products=Sum("quantity")).get("number_of_products")
+
+    number_of_ordered_products.short_description = 'Количество заказанных товаров' # https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#the-display-decorator
 
     def get_absolute_url(self):
         return reverse('order-detail', kwargs={"pk": self.id})

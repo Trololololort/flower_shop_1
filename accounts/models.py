@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     Т.е. судя по документации, рекомендуется второй способ.
     """
 
-    partonymic = models.CharField(max_length=100, blank=False, verbose_name="Отчество") # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#charfield
+    patronymic = models.CharField(max_length=100, blank=False, verbose_name="Отчество") # https://docs.djangoproject.com/en/5.0/ref/forms/fields/#charfield
 
 
     """
@@ -29,3 +29,10 @@ class CustomUser(AbstractUser):
                                 null=False,
                                 default=False,
                                 )
+
+    @property
+    def full_name(self):
+        """
+        Для админки. По ТЗ в списке заказов видно ФИО заказчика.
+        """
+        return "{} {} {}".format(self.last_name, self.patronymic, self.last_name)

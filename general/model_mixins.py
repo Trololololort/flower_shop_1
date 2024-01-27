@@ -20,5 +20,6 @@ class UserMixin(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name="Пользователь", )
 
+
     class Meta:
         abstract = True
