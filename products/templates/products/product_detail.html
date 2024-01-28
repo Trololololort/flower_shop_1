@@ -1,5 +1,13 @@
 {% extends 'general/base.html' %}
 
+{% comment %}
+Выведен ряд характеристик, которые не требовались для
+карточки товара по ТЗ (время добавления товара, количество в наличии).
+
+Но они выведены для удобства эксперта.
+{% endcomment %}
+
+
 {% block headline %}
   {% include 'general/h.html' with headline="Товар" %}
   {% include 'general/message.html' %}
@@ -23,7 +31,7 @@
                 <li>Категория/вид товара: {{ object.category }}</li>
                 <li>Цвет: {{ object.color }}</li>
                 <li>Страна-производитель: {{ object.origin }}</li>
-                <li>Поступил в продажу: {{ object.added }}</li>
+                <li>Поступил в продажу: {{ object.added_at }}</li>
               </ul>
             </a>
 
