@@ -31,12 +31,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+
+    """
+    Добавим все свои приложения.
+    https://docs.djangoproject.com/en/5.0/ref/settings/#installed-apps
+    """
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'general',
     'products',
     'companies',
