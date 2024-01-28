@@ -1,6 +1,8 @@
 {% extends 'general/base.html' %}
 
 {% block content %}
+{% include 'general/message.html' %}
+
 <div class="form-signin w-100 m-auto">
     <form method="post">
         {% csrf_token %}

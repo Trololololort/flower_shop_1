@@ -122,4 +122,5 @@ class IsLoginFreeView(
         status_code = get_status_and_message_whether_login_is_free(login)
 
         # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpResponse
-        return HttpResponse(status_code)
+        # https://docs.djangoproject.com/en/5.0/ref/request-response/#id4
+        return HttpResponse(status=status_code)

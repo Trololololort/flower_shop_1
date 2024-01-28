@@ -4,7 +4,7 @@
 {% comment %}
 
 Применяется form.as_p, потому что на мобильных устройствах в данном случае
-такое отображение выглядит лучше. На десктопах красивее
+такое отображение выглядит лучше. На десктопах <красивее></красивее>
 <table>
     {{ form.as_table }}
 </table>
@@ -16,7 +16,27 @@
 Останется время, переверстаете на форму из Bootstrap. А если времени не останется, то
 и вариантов нет других, кроме как as_p или as_table.
 
+
+Сообщения об ошибках созданы копированием сообщений,
+которые создае "The messages framework".
+
+https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+
+Пример такого сообщения:
+<span class='d-block p-2 bg-danger mb-3'>Логин занят.</span>
+
+Сделано это по причинам единства:
+1. Стиля.
+2. Отдалки.
+
+Чтобы скопировать такое сообщение, проще всего пойти в каталог,
+добавить товар в корзину и получить сообщение.
+
+После копирования заменить класс на bg-danger.
+
 {% endcomment %}
+
+
 
 {% block content %}
 <div class="form-signin w-100 m-auto">
@@ -35,7 +55,7 @@
     let $signUpButton = $("#sign-up-button");
 
     function clearErrorMessages(){
-      $(".error").remove();
+      $(".bg-danger").remove();
     }
 
     function isPasswordRepeated(){
@@ -47,12 +67,14 @@
 
     function showPasswordRepeatedErrorMessage(){
       let $repeatedPassword = $("#id_repeated_password");
-      $("<p class='error'>Повтор пароля не совпадает с паролем.</p>").insertBefore($repeatedPassword);
+      $("<span class='d-block p-2 bg-danger mb-3'>Повтор пароля не совпадает с паролем.</span>").insertBefore($repeatedPassword);
+      animateMessage();
     }
 
     function showLoginOccupiedErrorMessage(){
         let $login = $("#id_login");
-        $("<p style='color: red;' class='error'>Логин занят.</p>").insertBefore($login);
+        $("<span class='d-block p-2 bg-danger mb-3'>Логин занят.</span>").insertBefore($login);
+        animateMessage();
     }
 
 
@@ -66,10 +88,7 @@
       });
     }
 
-    function showLoginErrorMessage(){
-        let $login = $("id_login");
-        $("<p class='error'>Логин занят.</p>").insertBefore($login);
-    }
+
 
     function validateFormAndShowErrorMessages(){
         let formValid = $signUpForm[0].reportValidity(); // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reportValidity
@@ -94,16 +113,20 @@
         $signUpForm.submit();
     }
 
-    function addEventListeners(){
-        $signUpButton.on( "click", function( event ) {
+
+    function reactToSignUpButtonClick( event ){
             event.preventDefault();
             clearErrorMessages();
             validateFormAndShowErrorMessages();
-        });
+    }
+
+    function addEventListeners(){
+        $signUpButton.on( "click", reactToSignUpButtonClick);
     }
 
     $( document ).ready(function() {
       addEventListeners();
     });
 </script>
+
 {% endblock %}

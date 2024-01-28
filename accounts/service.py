@@ -40,7 +40,7 @@ def create_user(surname,
                 password):
     user = CustomUser.objects.create(last_name=surname,
                                      first_name=name,
-                                     patronymic=patronymic,
+                                     patronymic_name=patronymic,
                                      username=login,
                                      password=make_password(password), # Функция из модуля django.contrib.auth.hashers
                                      email=email,
