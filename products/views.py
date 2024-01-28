@@ -1,7 +1,11 @@
+from django.http import HttpResponse
+from django.views import View
 from django.views.generic import DetailView, ListView
 
+from general.const import HttpStatusCodes
 from products.forms import ProductSortFilterForm
 from products.models import Product
+from products.service import are_there_enough_products
 
 
 class ProductDetailView(DetailView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#detailview
@@ -50,3 +54,18 @@ class ProductListView(ListView):
         # https://docs.djangoproject.com/en/5.0/ref/forms/api/#bound-and-unbound-forms
         context_data["sort_filter_form"] = ProductSortFilterForm(self.request.GET)
         return context_data
+
+
+class AreThereEnoughInStock(View):
+
+    def post(self, request):
+        product_id = request.POST.get('product_id')
+
+        enough_in_stock = are_there_enough_products(request.user, product_id)
+
+        if enough_in_stock:
+            result = HttpResponse(status=HttpStatusCodes.OK_NO_CONTENT.value)
+        else:
+            result = HttpResponse("Out of stock", status=HttpStatusCodes.OUT_OF_STOCK.value)
+
+        return result

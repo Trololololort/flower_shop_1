@@ -6,13 +6,15 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 
-from selected_products.service import add_product_to_cart, get_cart_contents
+from general.const import HttpStatusCodes
+from selected_products.service import get_cart_contents, add_product_to_cart_and_prepare_message
 from general.services import get_total
 from orders.forms import OrderForm
 
 
-class AddToCart(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
-                View): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
+class AddToCart(LoginRequiredMixin,
+                # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                View):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#view
     def post(self, request):
         """
         Добавить или убрать товар из корзины.
@@ -30,29 +32,32 @@ class AddToCart(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topi
 
         assert (addend == 1 or addend == -1)
 
-        status = add_product_to_cart(product_id, request.user, addend)
+        status = add_product_to_cart_and_prepare_message(product_id, request.user, addend)
 
-        if status["status"] == 200:
-            messages.add_message(request, messages.INFO, status["message"]) # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+        if status["status"] == HttpStatusCodes.OK:
+            messages.add_message(request, messages.INFO,
+                                 status["message"])  # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
 
             # В запросе всегда содержится адрес страницы, отправившей его.
-            # В корзину добавляться товар может с разных страниц.
+            # В корзину добавляться товар может с разных страниц (из каталога, из з карточки товара и из корзины).
             # Вернем ответ адресату запроса.
-            return redirect(request.META['HTTP_REFERER']) # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
+            return redirect(
+                request.META['HTTP_REFERER'])  # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
         else:
-            return HttpResponse(status["message"], status=status["status"]) # https://docs.djangoproject.com/en/5.0/ref/request-response/#httpresponse-objects
+            return HttpResponse(status["message"], status=status[
+                "status"].value)  # https://docs.djangoproject.com/en/5.0/ref/request-response/#httpresponse-objects
 
 
-class CartDetailView(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
-                     TemplateView): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
-    template_name = "selected_products/cart.html" # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
+class CartDetailView(LoginRequiredMixin,
+                     # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
+                     TemplateView):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
+    template_name = "selected_products/cart.html"  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
 
-    def get_context_data(self, **kwargs): # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
+    def get_context_data(self,
+                         **kwargs):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
         context = super().get_context_data(**kwargs)
         object_list = get_cart_contents(self.request.user)
         context["object_list"] = object_list
         context["order_form"] = OrderForm()
         context["total"] = get_total(object_list)
         return context
-
-

@@ -24,7 +24,7 @@ from accounts.views import SignUpView, IsLoginFreeView, ExtendedLoginView
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
-from products.views import ProductDetailView, ProductListView
+from products.views import ProductDetailView, ProductListView, AreThereEnoughInStock
 
 urlpatterns = [
       path("", ProductListView.as_view(), name="home"),
@@ -40,6 +40,8 @@ urlpatterns = [
 
       path("products/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
       path("products/", ProductListView.as_view(), name="product-list"),
+
+      path("are-there-enough-in-stock/", AreThereEnoughInStock.as_view(), name="are-there-enough-in-stock"),
 
       path("about/", AboutCompanyView.as_view(), name="about"),
 

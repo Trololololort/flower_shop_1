@@ -34,6 +34,3 @@ FIELD_NAME_MAPPING = {
 }
 
 
-class HttpStatusCodes(Enum):
-    OK = 204
-    CONFLICT = 409

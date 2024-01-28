@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 
-from accounts.const import HttpStatusCodes
+from general.const import HttpStatusCodes
 from accounts.models import CustomUser
 
 
@@ -17,9 +17,9 @@ def get_status_and_message_whether_login_is_free(login):
     login_is_occupied = bool(CustomUser.objects.filter(username=login).first())
 
     if not login_is_occupied:
-        status_code = HttpStatusCodes.OK.value
+        status_code = HttpStatusCodes.OK_NO_CONTENT.value
     else:
-        status_code = HttpStatusCodes.CONFLICT.value
+        status_code = HttpStatusCodes.LOGIN_OCCUPIED.value
 
     return status_code
 

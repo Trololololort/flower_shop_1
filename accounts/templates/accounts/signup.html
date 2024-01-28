@@ -54,10 +54,6 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
     let $signUpForm = $("#sign-up-form");
     let $signUpButton = $("#sign-up-button");
 
-    function clearErrorMessages(){
-      $(".bg-danger").remove();
-    }
-
     function isPasswordRepeated(){
       let $password = $("#id_password").val();
       let $repeatedPassword = $("#id_repeated_password").val();
@@ -116,7 +112,7 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
 
     function reactToSignUpButtonClick( event ){
             event.preventDefault();
-            clearErrorMessages();
+            clearMessages();
             validateFormAndShowErrorMessages();
     }
 
@@ -128,5 +124,7 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
       addEventListeners();
     });
 </script>
+
+{% include 'general/clear_messages.html' %}
 
 {% endblock %}
