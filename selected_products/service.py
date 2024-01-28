@@ -18,7 +18,7 @@ def get_cart_contents(user):
     return object_list
 
 
-def add_product_to_cart_and_prepare_message(product_id, user, addend):
+def add_product_to_cart(product_id, user, addend):
     """
     Корзина виртуальная.
     См. комментарий к модели selected_products.SelectedProduct.
@@ -59,13 +59,21 @@ def add_product_to_cart_and_prepare_message(product_id, user, addend):
         else:
             SelectedProduct.objects.create(user=user, product=product, quantity=1)
         status = HttpStatusCodes.OK
-
-        act = "добавлен в корзину" if addend > 0 else "убран из корзины"
-
-        message = 'Товар "{}" {}.'.format(product.name, act)
     else:
         # Страховка. Не должны сюда попасть.
         status = HttpStatusCodes.WRONG_PRODUCT_ID
+
+
+    return status
+
+
+def get_message_whether_product_added_to_cart(http_status, addend):
+    if http_status == HttpStatusCodes.OK:
+
+        act = "добавлен в корзину" if addend > 0 else "убран из корзины"
+
+        message = 'Товар {}.'.format(act)
+    else:
         message = "Wrong product id"
 
-    return {"status": status, "message": message}
+    return message

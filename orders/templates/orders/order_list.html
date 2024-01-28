@@ -1,7 +1,12 @@
 {% extends 'general/base.html' %}
 
+{% block headline %}
+    {% include 'general/h.html' with headline="Заказы" %}
+    {% include 'general/message.html' %}
+{% endblock %}
+
+
 {% block content %}
-{% include 'general/message.html' %}
 
 <div class="table-responsive small">
     {% if object_list %}

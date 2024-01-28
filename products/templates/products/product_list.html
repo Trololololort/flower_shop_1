@@ -1,12 +1,18 @@
 {% extends 'general/base.html' %}
 
+{% comment %}
+
+В список выведены дополнительные характеристики товара,
+которые по ТЗ не требовались.
+
+Но они здесь для удобства эксперта. Потому что надо проверить
+сортировку и фильтры.
+
+{% endcomment %}
+
 {% block headline %}
-<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-  <h1 class="display-4 fw-normal text-body-emphasis">Каталог</h1>
-</div>
-
-{% include 'general/message.html' %}
-
+    {% include 'general/h.html' with headline="Каталог" %}
+    {% include 'general/message.html' %}
 {% endblock %}
 
 

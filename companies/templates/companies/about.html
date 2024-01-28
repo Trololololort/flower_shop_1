@@ -26,14 +26,32 @@ https://docs.djangoproject.com/en/5.0/ref/models/fields/#filefield
 
 {% load static %}
 
+{% comment %}
 {% block headline %}
-<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-    <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
-    <h2 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h2>
 
-    <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+
+    <h1 class="display-4 fw-normal text-body-emphasis">О нас</h1>
+
+
+
 </div>
+{% endcomment %}
+
+{% block headline %}
+    {% include 'general/h.html' with headline="О нас" %}
+    <div class="text-center mb-3">
+        <h2 class="fw-normal text-body-emphasis">Мир цветов</h2>
+        <h3 class="fw-normal text-body-emphasis">Каждому жителю по цветку</h3>
+        <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
+    </div>
+
+    <div class="text-center mb-3 mt-5">
+        <h5 class="fw-normal text-body-emphasis">Новинки компании</h5>
+    </div>
+    {% include 'general/message.html' %}
 {% endblock %}
+
 
 {% block content %}
 <div id="carouselExampleCaptions" class="carousel carousel-dark slide" data-bs-ride="carousel">

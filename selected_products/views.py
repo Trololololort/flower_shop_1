@@ -7,7 +7,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from general.const import HttpStatusCodes
-from selected_products.service import get_cart_contents, add_product_to_cart_and_prepare_message
+from selected_products.service import get_cart_contents, add_product_to_cart, get_message_whether_product_added_to_cart
 from general.services import get_total
 from orders.forms import OrderForm
 
@@ -32,11 +32,13 @@ class AddToCart(LoginRequiredMixin,
 
         assert (addend == 1 or addend == -1)
 
-        status = add_product_to_cart_and_prepare_message(product_id, request.user, addend)
+        status = add_product_to_cart(product_id, request.user, addend)
+        message = get_message_whether_product_added_to_cart(http_status=status, addend=addend)
 
-        if status["status"] == HttpStatusCodes.OK:
-            messages.add_message(request, messages.INFO,
-                                 status["message"])  # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+        if status == HttpStatusCodes.OK:
+            messages.add_message(request,
+                                 messages.INFO,
+                                 message)  # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
 
             # В запросе всегда содержится адрес страницы, отправившей его.
             # В корзину добавляться товар может с разных страниц (из каталога, из з карточки товара и из корзины).
@@ -44,8 +46,8 @@ class AddToCart(LoginRequiredMixin,
             return redirect(
                 request.META['HTTP_REFERER'])  # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
         else:
-            return HttpResponse(status["message"], status=status[
-                "status"].value)  # https://docs.djangoproject.com/en/5.0/ref/request-response/#httpresponse-objects
+            return HttpResponse(message,
+                                status=status.value)  # https://docs.djangoproject.com/en/5.0/ref/request-response/#httpresponse-objects
 
 
 class CartDetailView(LoginRequiredMixin,
