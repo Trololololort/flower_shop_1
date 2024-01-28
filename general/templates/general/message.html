@@ -4,10 +4,11 @@
 {% endcomment %}
 
 
-{% if messages %}
-    <div id="general-messages">
+
+<div id="general-messages">
     {% for message in messages %}
         <span class="d-block p-2 {% if message.tags == 'info' %}bg-success{% else %}bg-danger{% endif %} mb-3">{{ message }}</span>
     {% endfor %}
-    </div>
+</div>
+{% if messages %}
 {% endif %}
