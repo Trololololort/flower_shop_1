@@ -18,21 +18,23 @@ class CreateOrder(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/to
         password = request.POST.get("password")
 
         # https://docs.djangoproject.com/en/5.0/topics/auth/default/#authenticating-users
-        password_correct_for_user = bool(auth.authenticate(request,
+        password_correct = bool(auth.authenticate(request,
                                                            username=user.username,
                                                            password=password))
 
-        if not password_correct_for_user:
-            messages.add_message(request, messages.ERROR, "Неверный пароль") # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
-            redirect_to_name = "cart-detail"
-        else:
+        if password_correct:
             new_order_id = create_order(user)
 
             # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             messages.add_message(request, messages.INFO,
                                  "Ваш заказ номер {} принят к исполнению.".format(new_order_id))
-            redirect_to_name = "orders-list"
-        return redirect(redirect_to_name) # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
+            where_to_redirect = "orders-list"
+        else:
+            messages.add_message(request, messages.ERROR,
+                                 "Неверный пароль")  # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
+            where_to_redirect = "cart-detail"
+
+        return redirect(where_to_redirect) # https://docs.djangoproject.com/en/5.0/topics/http/shortcuts/#redirect
 
 
 class OrdersListView(LoginRequiredMixin, # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
