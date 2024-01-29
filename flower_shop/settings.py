@@ -29,13 +29,13 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-
+"""
+Добавим все свои приложения.
+https://docs.djangoproject.com/en/5.0/ref/settings/#installed-apps
+"""
 INSTALLED_APPS = [
 
-    """
-    Добавим все свои приложения.
-    https://docs.djangoproject.com/en/5.0/ref/settings/#installed-apps
-    """
+
     
     'django.contrib.admin',
     'django.contrib.auth',
