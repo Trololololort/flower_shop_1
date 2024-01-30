@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-h_ar#s80a4y3=wvh-gir!h#rr4**v8tn6z^ct04&3&5$r@iasv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*',]
 
 # Application definition
 """
@@ -127,7 +127,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 MEDIA_URL = 'media/'  # https://docs.djangoproject.com/en/5.0/ref/settings/#media-url
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
+
+
+STATIC_ROOT = "/home/g/grablmz2/alice.academic.gift/public_html/static"
+
+# https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') if DEBUG else "/home/g/grablmz2/alice.academic.gift/public_html/media"
+
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
