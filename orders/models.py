@@ -33,9 +33,9 @@ class Order(UserMixin,
     ordered_by.short_description = 'ФИО заказчика' # https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#the-display-decorator
 
     def number_of_ordered_products(self):
-        # Для админки: по ТЗ в списке видно количество заказанных товаров.
+        # Для списка заказов: по ТЗ в списке видно количество заказанных товаров.
         # https://docs.djangoproject.com/en/5.0/topics/db/aggregation/#aggregating-on-empty-querysets-or-groups
-        return self.selectedproduct_set.aggregate(number_of_products=Sum("quantity")).get("number_of_products")
+        return self.selectedproduct_set.aggregate(number_of_products=Sum("ordered_quantity")).get("number_of_products")
 
     number_of_ordered_products.short_description = 'Количество заказанных товаров' # https://docs.djangoproject.com/en/3.2/ref/contrib/admin/#the-display-decorator
 

@@ -38,6 +38,7 @@
             <th scope="col">Наименование</th>
             <th scope="col">Цена, руб.</th>
             <th scope="col">Количество, шт.</th>
+            <th scope="col">Сумма, руб.</th>
         </tr>
         </thead>
         <tbody>
@@ -47,13 +48,14 @@
             <td scope="col">{{ object.id }}</td>
             <td scope="col">{{ object.product.name }}</td>
             <td scope="col">{{ object.price }}</td>
-            <td scope="col">{{ object.quantity }}</td>
+            <td scope="col">{{ object.ordered_quantity }}</td>
+            <td scope="col">{{ object.total }}</td>
         </tr>
 
 
         {% endfor %}
 
-        {% include 'general/total.html' %}
+        {% include 'general/grand_total.html' %}
         </tbody>
     </table>
 

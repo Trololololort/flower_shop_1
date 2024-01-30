@@ -17,6 +17,7 @@
             <th scope="col">Заказ</th>
             <th scope="col">Время заказа</th>
             <th scope="col">Статус</th>
+            <th scope="col">Количество товаров</th>
             <th scope="col">Удалить</th>
         </tr>
         </thead>
@@ -28,6 +29,7 @@
             <td><a href="{{ object.get_absolute_url }}">{{ object.pk}} </a></td>
             <td>{{ object.ordered_at }}</td>
             <td>{{ object.get_status_display }}</td>
+            <td>{{ object.number_of_ordered_products }}</td>
             <td>{% if object.status == 'NEW' %}{% include 'orders/delete_order_form.html' with order=object %}{% endif %}
         </tr>
         {% endfor %}

@@ -46,6 +46,14 @@ class SelectedProduct(UserMixin,
     def price(self):
         return self.product.price
 
+
+    def total(self):
+        return round(self.price * self.ordered_quantity, 2)
+
+
+    def sum(self):
+        return round(self.price * self.ordered_quantity, 2)
+
     # https://docs.djangoproject.com/en/5.0/ref/models/instances/#str
     def __str__(self):
         return self.product.name

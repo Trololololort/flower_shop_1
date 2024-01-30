@@ -65,7 +65,7 @@ class OrderDetailView(LoginRequiredMixin,
         # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
         context = super().get_context_data(**kwargs)
         context["object_list"] = self.object.selectedproduct_set.all()
-        context["total"] = get_total(context["object_list"])
+        context["grand_total"] = get_total(context["object_list"])
         return context
 
 

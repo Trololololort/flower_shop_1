@@ -46,14 +46,17 @@ https://docs.djangoproject.com/en/5.0/ref/models/fields/#filefield
         <img class="about-logo" src="{% static 'companies/img/logo.svg' %}" alt="logo">
     </div>
 
-    <div class="text-center mb-3 mt-5">
-        <h5 class="fw-normal text-body-emphasis">Новинки компании</h5>
-    </div>
     {% include 'general/message.html' %}
 {% endblock %}
 
 
 {% block content %}
+{% if object_list %}
+
+<div class="text-center mb-3 mt-5">
+    <h5 class="fw-normal text-body-emphasis">Новинки компании</h5>
+</div>
+
 <div id="carouselExampleCaptions" class="carousel carousel-dark slide" data-bs-ride="carousel">
 
     <div class="carousel-indicators">
@@ -83,5 +86,6 @@ https://docs.djangoproject.com/en/5.0/ref/models/fields/#filefield
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+{% endif %}
 {% endblock %}
 

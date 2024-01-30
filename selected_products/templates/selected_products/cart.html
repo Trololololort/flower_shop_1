@@ -23,10 +23,11 @@
         <tr>
             <th scope="col">Артикул</th>
             <th scope="col">Наименование</th>
-            <th class="text-center" scope="col">Цена</th>
+            <th class="text-center" scope="col">Цена, руб.</th>
             <th scope="col"></th>
             <th scope="col"></th>
-            <th class="text-center" scope="col">Количество</th>
+            <th class="text-center" scope="col">Количество, шт.</th>
+            <th class="text-center" scope="col">Сумма, руб.</th>
         </tr>
         </thead>
         <tbody>
@@ -44,11 +45,12 @@
             </td>
 
             <td class="text-center">{{ object.ordered_quantity }}</td>
+            <td class="text-center">{{ object.total }}</td>
         </tr>
         {% endfor %}
 
 
-        {% include 'general/total.html' %}
+        {% include 'general/grand_total.html' %}
 
         </tbody>
     </table>

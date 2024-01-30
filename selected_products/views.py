@@ -61,5 +61,5 @@ class CartDetailView(LoginRequiredMixin,
         object_list = get_cart_contents(self.request.user)
         context["object_list"] = object_list
         context["order_form"] = OrderForm()
-        context["total"] = get_total(object_list)
+        context["grand_total"] = get_total(object_list)
         return context
