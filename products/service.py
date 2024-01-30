@@ -12,7 +12,7 @@ def are_there_enough_products(user, product_id):
     """
     product = Product.objects.filter(pk=product_id).first()
     all_products_in_cart = get_cart_contents(user)
-    product_in_cart = all_products_in_cart.filter(product=product_id).values_list("quantity", flat=True)
+    product_in_cart = all_products_in_cart.filter(product=product_id).values_list("ordered_quantity", flat=True)
 
     TO_BE_ORDERED = 1
 

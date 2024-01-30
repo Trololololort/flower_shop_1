@@ -28,10 +28,10 @@ class SelectedProduct(UserMixin,
     # трактуем самостоятельно: только штучный.
 
     # https://docs.djangoproject.com/en/5.0/ref/models/fields/#positiveintegerfield
-    quantity = models.PositiveIntegerField(blank=False,
-                                           null=False,
-                                           default=0,
-                                           verbose_name="Количество")
+    ordered_quantity = models.PositiveIntegerField(blank=False,
+                                                   null=False,
+                                                   default=0,
+                                                   verbose_name="Количество")
 
 
     # https://docs.djangoproject.com/en/5.0/ref/models/fields/#foreignkey

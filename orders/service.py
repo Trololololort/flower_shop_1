@@ -1,8 +1,10 @@
+from enum import Enum
+
 from django.db import transaction
 
 from selected_products.models import SelectedProduct
 from orders.models import Order
-
+from selected_products.service import get_cart_contents
 
 """
 Правильно выполнять такие операции в транзакции.
@@ -22,6 +24,26 @@ from orders.models import Order
 
 Документация: https://docs.djangoproject.com/en/5.0/topics/db/transactions/#django.db.transaction.atomic
 """
+class ArithmeticOperation(Enum):
+    PLUS = "+",
+    MINUS = "i"
+
+def adjust_stock(selected_products, arithmetic_operation):
+    for selected_product in selected_products:
+        if arithmetic_operation == ArithmeticOperation.MINUS:
+            selected_product.product.stock = selected_product.product.stock - selected_product.ordered_quantity
+        else:
+            assert arithmetic_operation == ArithmeticOperation.PLUS
+            selected_product.product.stock = selected_product.product.stock + selected_product.ordered_quantity
+
+        if selected_product.product.stock < 0:
+            raise Exception("Out of stock")
+
+        selected_product.product.save()
+
+
+
+
 
 @transaction.atomic
 def create_order(user):
@@ -31,18 +53,21 @@ def create_order(user):
     Возвращаем идентификатор вновь созданного заказа, чтобы в CreateOrderView
     создать сообщение пользователю, сославшись на этот номер.
     """
-    selected_products = SelectedProduct.objects.filter(user=user, order=None) # https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-specific-objects-with-filters
-
+    selected_products = get_cart_contents(user)
+    adjust_stock(selected_products, ArithmeticOperation.MINUS)
     new_order = Order.objects.create(user=user) # https://docs.djangoproject.com/en/5.0/topics/db/queries/#additional-methods-to-handle-related-objects
 
     selected_products.update(order=new_order) # https://docs.djangoproject.com/en/5.0/topics/db/queries/#updating-multiple-objects-at-once
 
     return new_order.pk
 
+@transaction.atomic
 def delete_order(order_id):
     # Не обрабатываем DoesNotExist,
     # позволяем исключению всплыть в вызывающий метод.
     order_obj = Order.objects.get(pk=order_id) # https://docs.djangoproject.com/en/5.0/topics/db/queries/#retrieving-a-single-object-with-get
+    selected_products_in_order = order_obj.selectedproduct_set.all()
+    adjust_stock(selected_products_in_order, ArithmeticOperation.PLUS)
     order_obj.delete() # https://docs.djangoproject.com/en/5.0/topics/db/queries/#deleting-objects
 
 

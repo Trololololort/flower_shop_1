@@ -1,5 +1,6 @@
 from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Model
 from django.shortcuts import redirect
 from django.views import View
@@ -82,7 +83,7 @@ class DeleteOrder(LoginRequiredMixin,
 
             # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             messages.add_message(request, messages.INFO, "Удален заказ {}.".format(order_id))
-        except Model.DoesNotExist:  # https://docs.djangoproject.com/en/5.0/ref/models/class/#doesnotexist
+        except ObjectDoesNotExist:  # https://docs.djangoproject.com/en/5.0/ref/models/class/#doesnotexist
 
             # https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             messages.add_message(request, messages.ERROR, "Не удалось удалить заказ {}.".format(order_id))

@@ -43,7 +43,7 @@
             {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
             </td>
 
-            <td class="text-center">{{ object.quantity }}</td>
+            <td class="text-center">{{ object.ordered_quantity }}</td>
         </tr>
         {% endfor %}
 

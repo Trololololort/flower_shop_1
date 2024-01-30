@@ -7,5 +7,5 @@ def get_total(a_queryset):
     2) Заказа.
     """
     sum = 0
-    [sum := sum + elem.product.price * elem.quantity for elem in a_queryset]
+    [sum := sum + elem.product.price * elem.ordered_quantity for elem in a_queryset]
     return sum

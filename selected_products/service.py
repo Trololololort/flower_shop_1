@@ -49,15 +49,15 @@ def add_product_to_cart(product_id, user, addend):
 
         if the_product_already_in_cart:
 
-            the_product_already_in_cart.quantity = (the_product_already_in_cart.quantity + addend)
+            the_product_already_in_cart.ordered_quantity = (the_product_already_in_cart.ordered_quantity + addend)
 
-            if the_product_already_in_cart.quantity == 0:
+            if the_product_already_in_cart.ordered_quantity == 0:
                 the_product_already_in_cart.delete()  # https://docs.djangoproject.com/en/5.0/topics/db/queries/#deleting-objects
             else:
                 the_product_already_in_cart.save()  # https://docs.djangoproject.com/en/5.0/ref/models/instances/#saving-objects
 
         else:
-            SelectedProduct.objects.create(user=user, product=product, quantity=1)
+            SelectedProduct.objects.create(user=user, product=product, ordered_quantity=1)
         status = HttpStatusCodes.OK
     else:
         # Страховка. Не должны сюда попасть.
