@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class NameMixin(models.Model):
@@ -16,7 +17,7 @@ class NameMixin(models.Model):
 
 
 class UserMixin(models.Model):
-    user = models.ForeignKey("accounts.CustomUser", # https://docs.djangoproject.com/en/5.0/ref/models/fields/#foreignkey
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, # https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#referencing-the-user-model
                              on_delete=models.CASCADE,
                              verbose_name="Пользователь", )
 
