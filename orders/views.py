@@ -45,6 +45,7 @@ class OrdersListView(LoginRequiredMixin,
                      # https://docs.djangoproject.com/en/5.0/topics/auth/default/#the-loginrequiredmixin-mixin
                      ListView):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#listview
     model = Order
+    paginate_by = 5
 
     def get_queryset(
             self):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/mixins-single-object/#django.views.generic.detail.SingleObjectMixin.get_queryset

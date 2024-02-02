@@ -14,6 +14,7 @@ class ProductDetailView(DetailView): # https://docs.djangoproject.com/en/5.0/ref
 
 class ProductListView(ListView):
     model = Product
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = Product.in_stock.all()
