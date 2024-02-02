@@ -61,10 +61,20 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
       return $password == $repeatedPassword;
     }
 
+    function  highlightField(elementId){
+        let $repeatedPassword = $("#" + elementId);
+        $repeatedPassword.addClass("erroneous-field");
+    }
+
     function showPasswordRepeatedErrorMessage(){
       let $repeatedPassword = $("#id_repeated_password");
       $("<span class='d-block p-2 bg-danger mb-3'>Повтор пароля не совпадает с паролем.</span>").insertBefore($repeatedPassword);
       animateMessage();
+    }
+
+    function signalizeLoginOccupied(){
+        showLoginOccupiedErrorMessage();
+        highlightField("id_login");
     }
 
     function showLoginOccupiedErrorMessage(){
@@ -80,7 +90,7 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
             url: "{% url 'is-login-free' %}",
             data: $signUpForm.serialize(),
             success: signUp,
-            error: showLoginOccupiedErrorMessage,
+            error: signalizeLoginOccupied,
       });
     }
 
@@ -97,6 +107,7 @@ https://docs.djangoproject.com/en/5.0/ref/contrib/messages/
 
         if (!passwordRepeated) {
           showPasswordRepeatedErrorMessage();
+          highlightField("id_repeated_password");
 
           return false;
         }

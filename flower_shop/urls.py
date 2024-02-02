@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from django.views.generic import RedirectView
 
 from accounts.views import SignUpView, IsLoginFreeView, ExtendedLoginView
+from general.views import Instruction
 from selected_products.views import AddToCart, CartDetailView
 from companies.views import AboutCompanyView, ContactsView
 from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrder
@@ -52,6 +53,7 @@ urlpatterns = [
       path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
       path("orders/delete/", DeleteOrder.as_view(), name="delete-order"),
       path("orders/", OrdersListView.as_view(), name="orders-list"),
+      path("instruction/", Instruction.as_view(), name="instruction"),
 
 
 

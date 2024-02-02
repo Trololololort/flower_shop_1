@@ -2,6 +2,7 @@ from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Model
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import ListView, DetailView
@@ -59,13 +60,25 @@ class OrderDetailView(LoginRequiredMixin,
                       DetailView):  # https://docs.djangoproject.com/en/5.0/ref/class-based-views/generic-display/#detailview
     model = Order
 
+    def get_queryset(self, **kwargs):
+        # Не дать пользователю посмотреть чужие заказы.
+        # Причина: LoginRequiredMixin обеспечивает только
+        # проверку, авторизован ли пользователь.
+        # Пусто он авторизован, но он может
+        # вручную перебирать заказы, меняя цифрц.
+        # /orders/15
+        
+        return super().get_queryset(**kwargs).filter(user=self.request.user)
+
     def get_context_data(self, **kwargs):
         # Удобно посмотреть, как переопределить данный метод, в документации
         # к TemplateView.
         # https://docs.djangoproject.com/en/5.0/ref/class-based-views/base/#templateview
         context = super().get_context_data(**kwargs)
         context["object_list"] = self.object.selectedproduct_set.all()
+
         context["grand_total"] = get_total(context["object_list"])
+
         return context
 
 

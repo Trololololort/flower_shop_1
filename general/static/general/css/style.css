@@ -14,3 +14,11 @@ a {
     color: purple !important;
     text-decoration: none !important;
 }
+
+.errorlist {
+    color: var(--bs-danger);
+}
+
+.erroneous-field {
+    border-color: red;
+}
