@@ -163,9 +163,9 @@
             <li><a class="me-3 py-2 link-body-emphasis dropdown-item" href="{% url 'product-list' %}">Каталог</a></li>
             <li><a class="me-3 py-2 link-body-emphasis dropdown-item" href="{% url 'contacts' %}">Где нас найти</a></li>
               {% if user.is_authenticated %}
-                <li><a class="me-5 py-2 link-body-emphasis text-decoration-none dropdown-item"
+                <li><a class="me-5 py-2 link-body-emphasis dropdown-item"
                                                  href="{% url 'cart-detail' %}">&#128722;</a></li>
-                <li><a class="btn dropdown-item" href="{% url 'orders-list' %}">Мои заказы</a></li>
+                <li><a class="btn link-body-emphasis dropdown-item" href="{% url 'orders-list' %}">Мои заказы</a></li>
               {% else %}
                   <li><a class="link-body-emphasis dropdown-item" href="{% url 'login' %}">Вход</a></li>
                   <li><a class="link-body-emphasis dropdown-item" href="{% url 'signup' %}">Регистрация</a></li>

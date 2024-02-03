@@ -1,19 +1,15 @@
 {% extends 'general/base.html' %}
 {% load static %}
 
-
-
-
 {% block headline %}
-    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-      <h1 class="display-4 fw-normal text-body-emphasis">Корзина</h1>
-    </div>
-  {% include 'general/message.html' %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal text-body-emphasis">Корзина</h1>
+</div>
+{% include 'general/message.html' %}
 {% endblock %}
 
 
 {% block content %}
-
 
 
 {% if object_list %}
@@ -37,11 +33,11 @@
             <td>{{ object.product.name }} {% if object.product.color %} ({{ object.product.color }}) {% endif %}</td>
             <td class="text-center">{{ object.product.price }}</td>
             <td class="text-end">
-            {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id button_text="+" %}
+                {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id  button_text='+' %}
             </td>
 
             <td class="text-start">
-            {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text="-" %}
+                {% include 'selected_products/parts/add_to_cart_form.html' with product_id=object.product.id addend=-1 button_text='-' %}
             </td>
 
             <td class="text-center">{{ object.ordered_quantity }}</td>

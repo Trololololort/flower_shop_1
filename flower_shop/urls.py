@@ -28,7 +28,7 @@ from orders.views import CreateOrder, OrdersListView, OrderDetailView, DeleteOrd
 from products.views import ProductDetailView, ProductListView, AreThereEnoughInStock
 
 urlpatterns = [
-      path("", ProductListView.as_view(), name="home"),
+      path("", AboutCompanyView.as_view(), name="home"),
       path('admin/', admin.site.urls),
 
       path("accounts/login/", ExtendedLoginView.as_view(), name="login"),
