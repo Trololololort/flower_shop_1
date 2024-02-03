@@ -153,37 +153,34 @@
       </a>
 
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-        <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'about' %}">О нас</a>
-        <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'product-list' %}">Каталог</a>
-        <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'contacts' %}">Где нас найти</a>
+        <div class="dropdown">
+          <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Меню
+          </a>
+
+          <ul class="dropdown-menu">
+            <li><a class="me-3 py-2 link-body-emphasis dropdown-item" href="{% url 'about' %}">О нас</a></li>
+            <li><a class="me-3 py-2 link-body-emphasis dropdown-item" href="{% url 'product-list' %}">Каталог</a></li>
+            <li><a class="me-3 py-2 link-body-emphasis dropdown-item" href="{% url 'contacts' %}">Где нас найти</a></li>
+              {% if user.is_authenticated %}
+                <li><a class="me-5 py-2 link-body-emphasis text-decoration-none dropdown-item"
+                                                 href="{% url 'cart-detail' %}">&#128722;</a></li>
+                <li><a class="btn dropdown-item" href="{% url 'orders-list' %}">Мои заказы</a></li>
+              {% else %}
+                  <li><a class="link-body-emphasis dropdown-item" href="{% url 'login' %}">Вход</a></li>
+                  <li><a class="link-body-emphasis dropdown-item" href="{% url 'signup' %}">Регистрация</a></li>
+              {% endif %}
+          </ul>
+        </div>
 
 
-        {% if user.is_authenticated %}<a class="me-5 py-2 link-body-emphasis text-decoration-none"
-                                                 href="{% url 'cart-detail' %}">&#128722;</a>{% endif %}
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                            aria-expanded="false" style="{width: 3em}">
-                        {% if user.is_authenticated %}{{ user.username }}{% else %}Вход{% endif %}
-                    </button>
-                    <ul class="dropdown-menu">
 
-                        {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'logout' %}">{% csrf_token %}
-                            <li>
-                                <button class="btn btn-secondary dropdown-item">Выход</button>
-                            </li>
-                        </form>
-                        <li>
-                            <a class="btn btn-secondary dropdown-item" href="{% url 'orders-list' %}">Мои заказы</a>
-                        </li>
-                        {% else %}
-                            <li><a class="dropdown-item" href="{% url 'login' %}">Вход</a></li>
-                            <li><a class="dropdown-item" href="{% url 'signup' %}">Регистрация</a></li>
-                        {% endif %}
+          {% if user.is_authenticated %}
+          <form class="ms-3" method="post" action="{% url 'logout' %}">{% csrf_token %}
+              <button class="btn btn-secondary">Выход</button>
+          </form>
+          {% endif %}
 
-
-                    </ul>
-                </div>
       </nav>
     </div>
   </header>
