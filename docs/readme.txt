@@ -2374,3 +2374,22 @@ Order detail.
 
 
 {% endblock %}
+
+
+
+
+
+
+
+I. Предварительная подготовка
+
+Изучить tutorial: https://docs.djangoproject.com/en/5.0/
+Примечание: Advanced Tutorials изучать не нужно. Учить только
+Part 1: Requests and responses
+Part 2: Models and the admin site
+Part 3: Views and templates
+Part 4: Forms and generic views
+Part 5: Testing
+Part 6: Static files
+Part 7: Customizing the admin site
+Part 8: Adding third-party packages
